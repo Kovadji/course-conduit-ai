@@ -6,6 +6,10 @@ import { Presentation, BookOpen, Code, MessageCircle, Plus, Trash2, Image as Ima
 
 const AiTutor = () => {
   const quickActions = [
+    { icon: Presentation, label: "Presentation generation", description: "AI will create presentations for you" },
+    { icon: BookOpen, label: "Homework help", description: "AI will solve and explain assignments" },
+    { icon: Code, label: "Code generation", description: "AI will write code for you" },
+    { icon: MessageCircle, label: "Explain topics", description: "AI will explain any topic" },
   ];
 
   const folders = [
