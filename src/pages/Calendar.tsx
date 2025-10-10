@@ -2,12 +2,21 @@ import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Clock } from "lucide-react";
 import { Calendar as CalendarIcon } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const Calendar = () => {
   const [view, setView] = useState<"month" | "week" | "day">("week");
   const [currentDate] = useState(new Date(2025, 5, 6)); // June 6, 2025
+  const [showNewEvent, setShowNewEvent] = useState(false);
+  const [eventType, setEventType] = useState<"personal" | "course">("personal");
+  const [selectedDays, setSelectedDays] = useState<string[]>(["Tue", "Thu", "Sun"]);
+  const [recurringEnd, setRecurringEnd] = useState(true);
 
   const weekDays = ["Thu", "Fri", "Sut", "Sun", "Mon", "Tue", "Wed"];
   const dates = [4, 5, 6, 7, 8, 9, 10];
@@ -21,6 +30,12 @@ const Calendar = () => {
 
   const monthDays = Array.from({ length: 30 }, (_, i) => i + 1);
   const firstDayOfMonth = 0; // Monday
+
+  const toggleDay = (day: string) => {
+    setSelectedDays(prev => 
+      prev.includes(day) ? prev.filter(d => d !== day) : [...prev, day]
+    );
+  };
 
   return (
     <div className="p-6 h-[calc(100vh-4rem)] flex gap-6">
@@ -67,9 +82,108 @@ const Calendar = () => {
               >
                 Day
               </Button>
-              <Button className="ml-2">Create new</Button>
+              <Button className="ml-2" onClick={() => setShowNewEvent(true)}>Create new</Button>
             </div>
           </div>
+
+          {/* New Event Dialog */}
+          <Dialog open={showNewEvent} onOpenChange={setShowNewEvent}>
+            <DialogContent className="max-w-md">
+              <DialogHeader>
+                <DialogTitle>New event</DialogTitle>
+              </DialogHeader>
+              
+              <div className="space-y-4">
+                <Tabs value={eventType} onValueChange={(v) => setEventType(v as "personal" | "course")}>
+                  <TabsList className="grid w-full grid-cols-2">
+                    <TabsTrigger value="personal">Personal</TabsTrigger>
+                    <TabsTrigger value="course">Course</TabsTrigger>
+                  </TabsList>
+                </Tabs>
+
+                <div className="space-y-2">
+                  <Label>{eventType === "personal" ? "Type of event" : "Course"}</Label>
+                  <Select defaultValue={eventType === "personal" ? "other" : "ui-ux"}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {eventType === "personal" ? (
+                        <>
+                          <SelectItem value="other">Other</SelectItem>
+                          <SelectItem value="meeting">Meeting</SelectItem>
+                          <SelectItem value="task">Task</SelectItem>
+                        </>
+                      ) : (
+                        <>
+                          <SelectItem value="ui-ux">UI/UX Design</SelectItem>
+                          <SelectItem value="math">Math</SelectItem>
+                          <SelectItem value="english">English</SelectItem>
+                        </>
+                      )}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>Start</Label>
+                    <div className="space-y-2">
+                      <Input type="text" defaultValue="June 6" />
+                      <div className="flex items-center gap-2">
+                        <Clock className="h-4 w-4 text-muted-foreground" />
+                        <Input type="text" defaultValue="9:50" />
+                      </div>
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>End</Label>
+                    <div className="space-y-2">
+                      <Input type="text" defaultValue="June 6" />
+                      <div className="flex items-center gap-2">
+                        <Clock className="h-4 w-4 text-muted-foreground" />
+                        <Input type="text" defaultValue="11:30" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Recurrence</Label>
+                  <div className="flex gap-2">
+                    {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((day) => (
+                      <Button
+                        key={day}
+                        variant={selectedDays.includes(day) ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => toggleDay(day)}
+                        className="flex-1"
+                      >
+                        {day}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Recurrence end</Label>
+                  <div className="flex items-center justify-between">
+                    <Input type="text" defaultValue="June 17" className="flex-1" />
+                    <Switch checked={recurringEnd} onCheckedChange={setRecurringEnd} className="ml-3" />
+                  </div>
+                </div>
+
+                <div className="flex gap-3 pt-4">
+                  <Button variant="outline" className="flex-1" onClick={() => setShowNewEvent(false)}>
+                    Cancel
+                  </Button>
+                  <Button className="flex-1" onClick={() => setShowNewEvent(false)}>
+                    Create event
+                  </Button>
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
 
           {/* Calendar Grid */}
           {view === "week" && (

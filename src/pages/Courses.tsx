@@ -2,11 +2,17 @@ import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, Filter, Bookmark, Users, Star } from "lucide-react";
+import { Search, Filter, Bookmark, Users, Star, Upload, GripVertical, X } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const Courses = () => {
   const [activeTab, setActiveTab] = useState("popular");
+  const [showCreateCourse, setShowCreateCourse] = useState(false);
+  const [courseTags, setCourseTags] = useState(["Design", "UI/UX", "Web app"]);
 
   const courses = [
     {
@@ -39,7 +45,8 @@ const Courses = () => {
 
       {/* Category Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="w-full justify-start border-b rounded-none h-auto p-0 bg-transparent">
+        <div className="flex items-center justify-between mb-6">
+          <TabsList className="justify-start border-b rounded-none h-auto p-0 bg-transparent">
           <TabsTrigger 
             value="popular" 
             className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent"
@@ -70,7 +77,9 @@ const Courses = () => {
           >
             Soft skills
           </TabsTrigger>
-        </TabsList>
+          </TabsList>
+          <Button onClick={() => setShowCreateCourse(true)}>Create new</Button>
+        </div>
 
         <TabsContent value={activeTab} className="mt-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -124,6 +133,122 @@ const Courses = () => {
           </div>
         </TabsContent>
       </Tabs>
+
+      {/* Create Course Dialog */}
+      <Dialog open={showCreateCourse} onOpenChange={setShowCreateCourse}>
+        <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-2xl">Design for beginners</DialogTitle>
+          </DialogHeader>
+          
+          <div className="flex gap-6">
+            {/* Left Side - Main Form */}
+            <div className="flex-1 space-y-6">
+              <div className="space-y-4">
+                <h3 className="font-semibold text-lg">Basic info</h3>
+                
+                <div className="space-y-2">
+                  <Label>Name</Label>
+                  <Input defaultValue="Design for beginners" />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Description</Label>
+                  <Textarea 
+                    defaultValue="Hi anyone! In this course you learn Design interfaces / Perfect UX / Launch projects"
+                    rows={3}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Cover image</Label>
+                  <div className="border-2 border-dashed rounded-lg p-8 flex flex-col items-center justify-center gap-3 hover:border-primary transition-colors cursor-pointer">
+                    <div className="w-24 h-24 bg-gradient-to-br from-purple-400 via-pink-500 to-orange-400 rounded-lg flex items-center justify-center">
+                      <div className="w-16 h-16 bg-white/20 rounded backdrop-blur-sm"></div>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <Upload className="h-4 w-4" />
+                      <span>Upload cover image</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Content</Label>
+                  <div className="space-y-2">
+                    {["Acquaintance with Figma", "UI / UX rules", "Light regulation"].map((item, i) => (
+                      <div key={i} className="flex items-center gap-2 p-3 border rounded-lg hover:bg-muted transition-colors">
+                        <GripVertical className="h-5 w-5 text-muted-foreground" />
+                        <span className="flex-1">{item}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Right Side - Settings */}
+            <div className="w-72 space-y-4">
+              <div className="space-y-2">
+                <Label>Course level</Label>
+                <Select defaultValue="beginner">
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="beginner">Beginner</SelectItem>
+                    <SelectItem value="intermediate">Intermediate</SelectItem>
+                    <SelectItem value="advanced">Advanced</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label>Course tag</Label>
+                <div className="flex flex-wrap gap-2">
+                  {courseTags.map((tag, i) => (
+                    <div key={i} className="flex items-center gap-1 px-3 py-1 bg-muted rounded-full text-sm">
+                      <span>{tag}</span>
+                      <button onClick={() => setCourseTags(courseTags.filter((_, idx) => idx !== i))}>
+                        <X className="h-3 w-3" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label>Pricing</Label>
+                <div className="space-y-2">
+                  <Label className="text-sm text-muted-foreground">Price</Label>
+                  <div className="flex gap-2">
+                    <Input defaultValue="120" className="flex-1" />
+                    <Select defaultValue="usd">
+                      <SelectTrigger className="w-20">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="usd">USD</SelectItem>
+                        <SelectItem value="eur">EUR</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label>Reward</Label>
+                <Input defaultValue="137 Exp" />
+              </div>
+
+              <div className="pt-4 space-y-3">
+                <Button variant="outline" className="w-full">Share</Button>
+                <Button className="w-full" onClick={() => setShowCreateCourse(false)}>Apply</Button>
+              </div>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

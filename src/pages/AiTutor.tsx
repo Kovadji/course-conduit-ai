@@ -6,10 +6,10 @@ import { Presentation, BookOpen, Code, MessageCircle, Plus, Trash2, Image as Ima
 
 const AiTutor = () => {
   const quickActions = [
-    { icon: Presentation, label: "Presentation generation", description: "AI will create presentations for you" },
-    { icon: BookOpen, label: "Homework help", description: "AI will solve and explain assignments" },
-    { icon: Code, label: "Code generation", description: "AI will write code for you" },
-    { icon: MessageCircle, label: "Explain topics", description: "AI will explain any topic" },
+    { icon: Presentation, label: "Presentation generation" },
+    { icon: BookOpen, label: "Homework help" },
+    { icon: Code, label: "Code generation" },
+    { icon: MessageCircle, label: "Explain topics" },
   ];
 
   const folders = [
@@ -37,15 +37,12 @@ const AiTutor = () => {
                   key={i} 
                   className="p-6 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 cursor-pointer group"
                 >
-                  <div className="flex flex-col gap-2">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <action.icon className="h-6 w-6 text-primary" />
-                        <span className="font-medium">{action.label}</span>
-                      </div>
-                      <Plus className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors" />
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <action.icon className="h-6 w-6 text-primary" />
+                      <span className="font-medium">{action.label}</span>
                     </div>
-                    <p className="text-sm text-muted-foreground">{action.description}</p>
+                    <Plus className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors" />
                   </div>
                 </Card>
               ))}
