@@ -6,10 +6,10 @@ import { Presentation, BookOpen, Code, MessageCircle, Plus, Trash2, Image as Ima
 
 const AiTutor = () => {
   const quickActions = [
-    { icon: Presentation, label: "Presentation generation" },
-    { icon: BookOpen, label: "Do your homework" },
-    { icon: Code, label: "Code generation" },
-    { icon: MessageCircle, label: "Explain topics" },
+    { icon: Presentation, label: "Presentation generation", description: "AI will create presentations for you" },
+    { icon: BookOpen, label: "Homework help", description: "AI will solve and explain assignments" },
+    { icon: Code, label: "Code generation", description: "AI will write code for you" },
+    { icon: MessageCircle, label: "Explain topics", description: "AI will explain any topic" },
   ];
 
   const folders = [
@@ -25,9 +25,9 @@ const AiTutor = () => {
         <div className="flex-1 flex items-center justify-center">
           <div className="max-w-2xl w-full space-y-8 text-center">
             <div className="space-y-2">
-              <h1 className="text-4xl font-bold">What can i help with?</h1>
+              <h1 className="text-4xl font-bold">How can I help you?</h1>
               <p className="text-lg text-muted-foreground">
-                Here to help with homework, advice, generation and more.
+                Choose from the recommendations below or ask me anything
               </p>
             </div>
 
@@ -37,12 +37,15 @@ const AiTutor = () => {
                   key={i} 
                   className="p-6 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 cursor-pointer group"
                 >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <action.icon className="h-6 w-6" />
-                      <span className="font-medium">{action.label}</span>
+                  <div className="flex flex-col gap-2">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <action.icon className="h-6 w-6 text-primary" />
+                        <span className="font-medium">{action.label}</span>
+                      </div>
+                      <Plus className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors" />
                     </div>
-                    <Plus className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors" />
+                    <p className="text-sm text-muted-foreground">{action.description}</p>
                   </div>
                 </Card>
               ))}
