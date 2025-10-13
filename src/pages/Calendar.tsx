@@ -17,16 +17,21 @@ const Calendar = () => {
   const [eventType, setEventType] = useState<"personal" | "course">("personal");
   const [selectedDays, setSelectedDays] = useState<string[]>(["Tue", "Thu", "Sun"]);
   const [recurringEnd, setRecurringEnd] = useState(true);
+  const [eventTitle, setEventTitle] = useState("UI/UX Design");
+  const [startDate, setStartDate] = useState("June 6");
+  const [startTime, setStartTime] = useState("9:50");
+  const [endDate, setEndDate] = useState("June 6");
+  const [endTime, setEndTime] = useState("11:30");
 
   const weekDays = ["Thu", "Fri", "Sut", "Sun", "Mon", "Tue", "Wed"];
   const dates = [4, 5, 6, 7, 8, 9, 10];
 
-  const events = [
+  const [events, setEvents] = useState([
     { day: 4, time: "10:00", duration: "40m", title: "Math", start: "9:40", end: "10:20" },
     { day: 5, time: "11:00", duration: "1h 40m", title: "English", start: "10:50", end: "12:30" },
     { day: 6, time: "10:00", duration: "1h 40m", title: "English", start: "9:50", end: "11:30" },
     { day: 7, time: "12:00", duration: "1h 40m", title: "Design", start: "11:50", end: "13:30", highlight: true },
-  ];
+  ]);
 
   const monthDays = Array.from({ length: 30 }, (_, i) => i + 1);
   const firstDayOfMonth = 0; // Monday
@@ -35,6 +40,20 @@ const Calendar = () => {
     setSelectedDays(prev => 
       prev.includes(day) ? prev.filter(d => d !== day) : [...prev, day]
     );
+  };
+
+  const handleCreateEvent = () => {
+    const newEvent = {
+      day: 6, // Default to current day
+      time: startTime,
+      duration: "1h 40m",
+      title: eventTitle,
+      start: startTime,
+      end: endTime,
+      highlight: false
+    };
+    setEvents([...events, newEvent]);
+    setShowNewEvent(false);
   };
 
   return (
@@ -103,22 +122,22 @@ const Calendar = () => {
 
                 <div className="space-y-2">
                   <Label>{eventType === "personal" ? "Type of event" : "Course"}</Label>
-                  <Select defaultValue={eventType === "personal" ? "other" : "ui-ux"}>
+                  <Select value={eventTitle} onValueChange={setEventTitle}>
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
                       {eventType === "personal" ? (
                         <>
-                          <SelectItem value="other">Other</SelectItem>
-                          <SelectItem value="meeting">Meeting</SelectItem>
-                          <SelectItem value="task">Task</SelectItem>
+                          <SelectItem value="Other">Other</SelectItem>
+                          <SelectItem value="Meeting">Meeting</SelectItem>
+                          <SelectItem value="Task">Task</SelectItem>
                         </>
                       ) : (
                         <>
-                          <SelectItem value="ui-ux">UI/UX Design</SelectItem>
-                          <SelectItem value="math">Math</SelectItem>
-                          <SelectItem value="english">English</SelectItem>
+                          <SelectItem value="UI/UX Design">UI/UX Design</SelectItem>
+                          <SelectItem value="Math">Math</SelectItem>
+                          <SelectItem value="English">English</SelectItem>
                         </>
                       )}
                     </SelectContent>
@@ -129,20 +148,20 @@ const Calendar = () => {
                   <div className="space-y-2">
                     <Label>Start</Label>
                     <div className="space-y-2">
-                      <Input type="text" defaultValue="June 6" />
+                      <Input type="text" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
                       <div className="flex items-center gap-2">
                         <Clock className="h-4 w-4 text-muted-foreground" />
-                        <Input type="text" defaultValue="9:50" />
+                        <Input type="text" value={startTime} onChange={(e) => setStartTime(e.target.value)} />
                       </div>
                     </div>
                   </div>
                   <div className="space-y-2">
                     <Label>End</Label>
                     <div className="space-y-2">
-                      <Input type="text" defaultValue="June 6" />
+                      <Input type="text" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
                       <div className="flex items-center gap-2">
                         <Clock className="h-4 w-4 text-muted-foreground" />
-                        <Input type="text" defaultValue="11:30" />
+                        <Input type="text" value={endTime} onChange={(e) => setEndTime(e.target.value)} />
                       </div>
                     </div>
                   </div>
@@ -177,7 +196,7 @@ const Calendar = () => {
                   <Button variant="outline" className="flex-1" onClick={() => setShowNewEvent(false)}>
                     Cancel
                   </Button>
-                  <Button className="flex-1" onClick={() => setShowNewEvent(false)}>
+                  <Button className="flex-1" onClick={handleCreateEvent}>
                     Create event
                   </Button>
                 </div>

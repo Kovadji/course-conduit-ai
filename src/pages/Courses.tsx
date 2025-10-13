@@ -13,6 +13,18 @@ const Courses = () => {
   const [activeTab, setActiveTab] = useState("popular");
   const [showCreateCourse, setShowCreateCourse] = useState(false);
   const [courseTags, setCourseTags] = useState(["Design", "UI/UX", "Web app"]);
+  const [coverImage, setCoverImage] = useState<string | null>(null);
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setCoverImage(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   const courses = [
     {
@@ -162,15 +174,27 @@ const Courses = () => {
 
                 <div className="space-y-2">
                   <Label>Cover image</Label>
-                  <div className="border-2 border-dashed rounded-lg p-8 flex flex-col items-center justify-center gap-3 hover:border-primary transition-colors cursor-pointer">
-                    <div className="w-24 h-24 bg-gradient-to-br from-purple-400 via-pink-500 to-orange-400 rounded-lg flex items-center justify-center">
-                      <div className="w-16 h-16 bg-white/20 rounded backdrop-blur-sm"></div>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <Upload className="h-4 w-4" />
-                      <span>Upload cover image</span>
-                    </div>
-                  </div>
+                  <label className="border-2 border-dashed rounded-lg p-8 flex flex-col items-center justify-center gap-3 hover:border-primary transition-colors cursor-pointer">
+                    <input 
+                      type="file" 
+                      accept="image/*" 
+                      className="hidden" 
+                      onChange={handleImageUpload}
+                    />
+                    {coverImage ? (
+                      <img src={coverImage} alt="Cover" className="w-full h-32 object-cover rounded-lg" />
+                    ) : (
+                      <>
+                        <div className="w-24 h-24 bg-gradient-to-br from-purple-400 via-pink-500 to-orange-400 rounded-lg flex items-center justify-center">
+                          <div className="w-16 h-16 bg-white/20 rounded backdrop-blur-sm"></div>
+                        </div>
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                          <Upload className="h-4 w-4" />
+                          <span>Upload cover image</span>
+                        </div>
+                      </>
+                    )}
+                  </label>
                 </div>
 
                 <div className="space-y-2">

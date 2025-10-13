@@ -6,6 +6,13 @@ import { ChevronDown, Paperclip, Mic, Send } from "lucide-react";
 
 const Chat = () => {
   const [selectedChat, setSelectedChat] = useState("Chat");
+  const [messageInput, setMessageInput] = useState("");
+  const [messages, setMessages] = useState([
+    { sender: "Человек 1", text: "Hello!", type: "other" },
+    { sender: "Person 2", text: "Hi there", type: "other" },
+    { sender: "Человек 1", text: "How are you?", type: "other" },
+    { sender: "You", text: "I'm good, thanks!", type: "self" },
+  ]);
 
   const contacts = [
     { name: "Person 1", message: "Axaaxax", time: "5 min ago" },
@@ -17,12 +24,19 @@ const Chat = () => {
     { name: "Тайр ага", message: "yaранейкум у тебя 4", time: "1 day ago" },
   ];
 
-  const messages = [
-    { sender: "Человек 1", text: "", type: "other" },
-    { sender: "Person 2", text: "", type: "other" },
-    { sender: "Человек 1", text: "", type: "other" },
-    { sender: "You", text: "", type: "self" },
-  ];
+  const handleSendMessage = () => {
+    if (messageInput.trim()) {
+      setMessages([...messages, { sender: "You", text: messageInput, type: "self" }]);
+      setMessageInput("");
+    }
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSendMessage();
+    }
+  };
 
   return (
     <div className="flex h-[calc(100vh-4rem)]">
@@ -107,7 +121,7 @@ const Chat = () => {
                       : "bg-muted"
                   }`}
                 >
-                  <p className="text-sm">{message.text || "Message content"}</p>
+                  <p className="text-sm">{message.text}</p>
                 </div>
               </div>
               {message.type === "self" && (
@@ -117,12 +131,6 @@ const Chat = () => {
               )}
             </div>
           ))}
-
-          <div className="flex justify-end">
-            <div className="bg-muted rounded-2xl px-4 py-2 max-w-md">
-              <span className="text-xs text-muted-foreground">Ты</span>
-            </div>
-          </div>
         </div>
 
         {/* Input Area */}
@@ -131,6 +139,9 @@ const Chat = () => {
             <Input
               placeholder="Write your message"
               className="flex-1 rounded-full bg-muted border-0"
+              value={messageInput}
+              onChange={(e) => setMessageInput(e.target.value)}
+              onKeyPress={handleKeyPress}
             />
             <Button variant="ghost" size="icon">
               <Mic className="h-5 w-5" />
@@ -138,7 +149,7 @@ const Chat = () => {
             <Button variant="ghost" size="icon">
               <Paperclip className="h-5 w-5" />
             </Button>
-            <Button size="icon" className="rounded-full">
+            <Button size="icon" className="rounded-full" onClick={handleSendMessage}>
               <Send className="h-5 w-5" />
             </Button>
           </div>
