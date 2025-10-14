@@ -19,7 +19,7 @@ const Chat = () => {
     { name: "Person 2", message: "пон", time: "30 min ago" },
     { name: "Person 3", message: "дану", time: "45 min ago" },
     { name: "Person 4", message: "О да! давай окунимся в ...", time: "45 min ago" },
-    { name: "Chat", message: "Шлюшка: Caco", time: "2 hour ago" },
+    { name: "Chat", message: "Hello there!", time: "2 hour ago" },
     { name: "Байсал агай", message: "Ғылым жоба қалай?", time: "5 hour ago" },
     { name: "Тайр ага", message: "yaранейкум у тебя 4", time: "1 day ago" },
   ];

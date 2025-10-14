@@ -12,7 +12,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const Calendar = () => {
   const [view, setView] = useState<"month" | "week" | "day">("week");
-  const [currentDate] = useState(new Date(2025, 5, 6)); // June 6, 2025
+  const [currentDate, setCurrentDate] = useState(new Date(2025, 5, 6)); // June 6, 2025
   const [showNewEvent, setShowNewEvent] = useState(false);
   const [eventType, setEventType] = useState<"personal" | "course">("personal");
   const [selectedDays, setSelectedDays] = useState<string[]>(["Tue", "Thu", "Sun"]);
@@ -23,8 +23,6 @@ const Calendar = () => {
   const [endDate, setEndDate] = useState("June 6");
   const [endTime, setEndTime] = useState("11:30");
 
-  const weekDays = ["Thu", "Fri", "Sut", "Sun", "Mon", "Tue", "Wed"];
-  const dates = [4, 5, 6, 7, 8, 9, 10];
 
   const [events, setEvents] = useState([
     { day: 4, time: "10:00", duration: "40m", title: "Math", start: "9:40", end: "10:20" },
@@ -43,10 +41,23 @@ const Calendar = () => {
   };
 
   const handleCreateEvent = () => {
+    // Parse start and end times
+    const [startHour, startMinute] = startTime.split(':').map(Number);
+    const [endHour, endMinute] = endTime.split(':').map(Number);
+    
+    // Calculate duration in minutes
+    const durationMinutes = (endHour * 60 + endMinute) - (startHour * 60 + startMinute);
+    const hours = Math.floor(durationMinutes / 60);
+    const minutes = durationMinutes % 60;
+    const durationText = hours > 0 ? `${hours}h${minutes > 0 ? ` ${minutes}m` : ''}` : `${minutes}m`;
+    
+    // Get the day from the current date for simplicity
+    const targetDay = currentDate.getDate();
+    
     const newEvent = {
-      day: 6, // Default to current day
+      day: targetDay,
       time: startTime,
-      duration: "1h 40m",
+      duration: durationText,
       title: eventTitle,
       start: startTime,
       end: endTime,
@@ -54,6 +65,36 @@ const Calendar = () => {
     };
     setEvents([...events, newEvent]);
     setShowNewEvent(false);
+  };
+
+  const navigateWeek = (direction: 'prev' | 'next') => {
+    const newDate = new Date(currentDate);
+    newDate.setDate(currentDate.getDate() + (direction === 'next' ? 7 : -7));
+    setCurrentDate(newDate);
+  };
+
+  const navigateDay = (direction: 'prev' | 'next') => {
+    const newDate = new Date(currentDate);
+    newDate.setDate(currentDate.getDate() + (direction === 'next' ? 1 : -1));
+    setCurrentDate(newDate);
+  };
+
+  const getWeekDates = () => {
+    const start = new Date(currentDate);
+    const day = start.getDay();
+    const diff = start.getDate() - day + (day === 0 ? -6 : 1);
+    start.setDate(diff);
+    
+    return Array.from({ length: 7 }, (_, i) => {
+      const date = new Date(start);
+      date.setDate(start.getDate() + i);
+      return date;
+    });
+  };
+
+  const weekDates = getWeekDates();
+  const formatMonthYear = (date: Date) => {
+    return date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
   };
 
   return (
@@ -69,13 +110,23 @@ const Calendar = () => {
           {/* Controls */}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Button variant="outline" size="icon">
+              <Button 
+                variant="outline" 
+                size="icon"
+                onClick={() => view === 'week' ? navigateWeek('prev') : navigateDay('prev')}
+              >
                 <ChevronLeft className="h-4 w-4" />
               </Button>
               <span className="font-medium px-4">
-                {view === "week" ? "June 4- June 11" : "Saturday, June 6"}
+                {view === "week" 
+                  ? `${weekDates[0].toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - ${weekDates[6].toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`
+                  : currentDate.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
               </span>
-              <Button variant="outline" size="icon">
+              <Button 
+                variant="outline" 
+                size="icon"
+                onClick={() => view === 'week' ? navigateWeek('next') : navigateDay('next')}
+              >
                 <ChevronRight className="h-4 w-4" />
               </Button>
             </div>
@@ -209,87 +260,125 @@ const Calendar = () => {
             <div className="grid grid-cols-[auto_repeat(7,1fr)] gap-px bg-border rounded-lg overflow-hidden">
               {/* Header Row */}
               <div className="bg-background"></div>
-              {weekDays.map((day, i) => (
-                <div key={day} className="bg-background p-4 text-center">
-                  <div className={`inline-flex flex-col items-center gap-1 ${i === 2 ? 'text-primary' : ''}`}>
-                    <span className="text-sm font-medium">{day}</span>
-                    <span className={`text-lg font-bold w-8 h-8 flex items-center justify-center rounded-lg ${
-                      i === 2 ? 'bg-primary text-primary-foreground' : 'bg-muted'
-                    }`}>
-                      {dates[i]}
-                    </span>
+              {weekDates.map((date, i) => {
+                const isToday = date.toDateString() === new Date().toDateString();
+                return (
+                  <div key={i} className="bg-background p-4 text-center">
+                    <div className={`inline-flex flex-col items-center gap-1 ${isToday ? 'text-primary' : ''}`}>
+                      <span className="text-sm font-medium">
+                        {date.toLocaleDateString('en-US', { weekday: 'short' })}
+                      </span>
+                      <span className={`text-lg font-bold w-8 h-8 flex items-center justify-center rounded-lg ${
+                        isToday ? 'bg-primary text-primary-foreground' : 'bg-muted'
+                      }`}>
+                        {date.getDate()}
+                      </span>
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
 
               {/* Time Rows */}
-              {Array.from({ length: 7 }, (_, hour) => (
-                <>
-                  <div key={`time-${hour}`} className="bg-background p-2 text-sm text-muted-foreground text-right pr-4">
-                    {9 + hour}:00
-                  </div>
-                  {dates.map((date, dayIndex) => {
-                    const event = events.find(e => e.day === date && parseInt(e.start.split(':')[0]) === 9 + hour);
-                    return (
-                      <div key={`${date}-${hour}`} className="bg-background p-1 min-h-[80px] relative">
-                        {event && (
-                          <div className={`absolute inset-1 rounded-lg p-2 ${
-                            event.highlight ? 'bg-primary text-primary-foreground' : 'bg-muted'
-                          }`}>
-                            <p className="font-medium text-sm">{event.title}</p>
-                            <p className="text-xs opacity-90">{event.duration}</p>
-                            <p className="text-xs opacity-75 mt-1">{event.start}-{event.end}</p>
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })}
-                </>
-              ))}
+              {Array.from({ length: 7 }, (_, hour) => {
+                const timeHour = 9 + hour;
+                return (
+                  <>
+                    <div key={`time-${hour}`} className="bg-background p-2 text-sm text-muted-foreground text-right pr-4">
+                      {timeHour}:00
+                    </div>
+                    {weekDates.map((date, dayIndex) => {
+                      const dayEvents = events.filter(e => 
+                        e.day === date.getDate() && 
+                        parseInt(e.start.split(':')[0]) === timeHour
+                      );
+                      
+                      return (
+                        <div key={`${date.getDate()}-${hour}`} className="bg-background p-1 min-h-[80px] relative">
+                          {dayEvents.map((event, idx) => {
+                            // Calculate height based on duration
+                            const [startH, startM] = event.start.split(':').map(Number);
+                            const [endH, endM] = event.end.split(':').map(Number);
+                            const durationMinutes = (endH * 60 + endM) - (startH * 60 + startM);
+                            const heightMultiplier = durationMinutes / 60;
+                            const height = heightMultiplier * 80; // 80px per hour
+                            
+                            return (
+                              <div 
+                                key={idx}
+                                className={`absolute inset-x-1 top-1 rounded-lg p-2 ${
+                                  event.highlight ? 'bg-primary text-primary-foreground' : 'bg-muted'
+                                }`}
+                                style={{ height: `${height}px` }}
+                              >
+                                <p className="font-medium text-sm">{event.title}</p>
+                                <p className="text-xs opacity-90">{event.duration}</p>
+                                <p className="text-xs opacity-75 mt-1">{event.start}-{event.end}</p>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      );
+                    })}
+                  </>
+                );
+              })}
             </div>
           )}
 
           {view === "day" && (
-            <div className="grid grid-cols-[auto_repeat(3,1fr)] gap-px bg-border rounded-lg overflow-hidden">
+            <div className="grid grid-cols-[auto_1fr] gap-px bg-border rounded-lg overflow-hidden">
               {/* Header Row */}
               <div className="bg-background"></div>
-              {["Fri", "Sut", "Sun"].map((day, i) => (
-                <div key={day} className="bg-background p-4 text-center">
-                  <div className={`inline-flex flex-col items-center gap-1 ${i === 1 ? 'text-primary' : ''}`}>
-                    <span className="text-sm font-medium">{day}</span>
-                    <span className={`text-lg font-bold w-8 h-8 flex items-center justify-center rounded-lg ${
-                      i === 1 ? 'bg-primary text-primary-foreground' : 'bg-muted'
-                    }`}>
-                      {5 + i}
-                    </span>
-                  </div>
+              <div className="bg-background p-4 text-center">
+                <div className="inline-flex flex-col items-center gap-1 text-primary">
+                  <span className="text-sm font-medium">
+                    {currentDate.toLocaleDateString('en-US', { weekday: 'short' })}
+                  </span>
+                  <span className="text-lg font-bold w-8 h-8 flex items-center justify-center rounded-lg bg-primary text-primary-foreground">
+                    {currentDate.getDate()}
+                  </span>
                 </div>
-              ))}
+              </div>
 
               {/* Time Rows */}
-              {Array.from({ length: 6 }, (_, hour) => (
-                <>
-                  <div key={`time-${hour}`} className="bg-background p-2 text-sm text-muted-foreground text-right pr-4">
-                    {9 + hour}:00
-                  </div>
-                  {[5, 6, 7].map((date, dayIndex) => {
-                    const event = events.find(e => e.day === date && parseInt(e.start.split(':')[0]) === 9 + hour);
-                    return (
-                      <div key={`${date}-${hour}`} className="bg-background p-1 min-h-[80px] relative">
-                        {event && (
-                          <div className={`absolute inset-1 rounded-lg p-2 ${
-                            event.highlight ? 'bg-primary text-primary-foreground' : 'bg-muted'
-                          }`}>
+              {Array.from({ length: 10 }, (_, hour) => {
+                const timeHour = 9 + hour;
+                const dayEvents = events.filter(e => 
+                  e.day === currentDate.getDate() && 
+                  parseInt(e.start.split(':')[0]) === timeHour
+                );
+                
+                return (
+                  <>
+                    <div key={`time-${hour}`} className="bg-background p-2 text-sm text-muted-foreground text-right pr-4">
+                      {timeHour}:00
+                    </div>
+                    <div className="bg-background p-1 min-h-[80px] relative">
+                      {dayEvents.map((event, idx) => {
+                        const [startH, startM] = event.start.split(':').map(Number);
+                        const [endH, endM] = event.end.split(':').map(Number);
+                        const durationMinutes = (endH * 60 + endM) - (startH * 60 + startM);
+                        const heightMultiplier = durationMinutes / 60;
+                        const height = heightMultiplier * 80;
+                        
+                        return (
+                          <div 
+                            key={idx}
+                            className={`absolute inset-x-1 top-1 rounded-lg p-2 ${
+                              event.highlight ? 'bg-primary text-primary-foreground' : 'bg-muted'
+                            }`}
+                            style={{ height: `${height}px` }}
+                          >
                             <p className="font-medium text-sm">{event.title}</p>
                             <p className="text-xs opacity-90">{event.duration}</p>
                             <p className="text-xs opacity-75 mt-1">{event.start}-{event.end}</p>
                           </div>
-                        )}
-                      </div>
-                    );
-                  })}
-                </>
-              ))}
+                        );
+                      })}
+                    </div>
+                  </>
+                );
+              })}
             </div>
           )}
         </div>
@@ -298,18 +387,32 @@ const Calendar = () => {
       {/* Right Sidebar - Mini Calendar */}
       <div className="w-80 space-y-4">
         <Card className="p-4">
-          <Select defaultValue="june-2025">
-            <SelectTrigger>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="june-2025">June 2025</SelectItem>
-              <SelectItem value="july-2025">July 2025</SelectItem>
-            </SelectContent>
-          </Select>
-        </Card>
+          <div className="flex items-center justify-between mb-4">
+            <Button 
+              variant="ghost" 
+              size="icon"
+              onClick={() => {
+                const newDate = new Date(currentDate);
+                newDate.setMonth(currentDate.getMonth() - 1);
+                setCurrentDate(newDate);
+              }}
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <span className="font-medium">{formatMonthYear(currentDate)}</span>
+            <Button 
+              variant="ghost" 
+              size="icon"
+              onClick={() => {
+                const newDate = new Date(currentDate);
+                newDate.setMonth(currentDate.getMonth() + 1);
+                setCurrentDate(newDate);
+              }}
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
 
-        <Card className="p-4">
           <div className="grid grid-cols-7 gap-2 mb-4">
             {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((day) => (
               <div key={day} className="text-center text-xs font-medium text-muted-foreground">
@@ -319,16 +422,24 @@ const Calendar = () => {
           </div>
           
           <div className="grid grid-cols-7 gap-2">
-            {monthDays.map((day) => (
-              <button
-                key={day}
-                className={`aspect-square flex items-center justify-center text-sm rounded-lg hover:bg-muted transition-colors ${
-                  day === 6 ? "bg-primary text-primary-foreground font-medium" : ""
-                }`}
-              >
-                {day}
-              </button>
-            ))}
+            {monthDays.map((day) => {
+              const isCurrentDay = day === currentDate.getDate();
+              return (
+                <button
+                  key={day}
+                  onClick={() => {
+                    const newDate = new Date(currentDate);
+                    newDate.setDate(day);
+                    setCurrentDate(newDate);
+                  }}
+                  className={`aspect-square flex items-center justify-center text-sm rounded-lg hover:bg-muted transition-colors ${
+                    isCurrentDay ? "bg-primary text-primary-foreground font-medium" : ""
+                  }`}
+                >
+                  {day}
+                </button>
+              );
+            })}
           </div>
         </Card>
       </div>

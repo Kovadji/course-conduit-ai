@@ -17,6 +17,10 @@ const AiTutor = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [chatHistory, setChatHistory] = useState<{ id: number; title: string; preview: string }[]>([
+    { id: 1, title: "UI/UX Presentation", preview: "Помоги создать презентацию..." },
+    { id: 2, title: "Math Homework", preview: "Реши уравнение..." },
+  ]);
   const scrollRef = useRef<HTMLDivElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -32,6 +36,16 @@ const AiTutor = () => {
     setMessages(prev => [...prev, userMessage]);
     setInput('');
     setIsLoading(true);
+
+    // Add to chat history if it's the first message
+    if (messages.length === 0) {
+      const newChat = {
+        id: Date.now(),
+        title: textToSend.slice(0, 30) + (textToSend.length > 30 ? '...' : ''),
+        preview: textToSend.slice(0, 50) + (textToSend.length > 50 ? '...' : '')
+      };
+      setChatHistory(prev => [newChat, ...prev]);
+    }
 
     try {
       const response = await fetch(
@@ -258,13 +272,35 @@ const AiTutor = () => {
         <div className="space-y-3">
           <Button variant="ghost" className="w-full justify-start gap-2 font-semibold">
             <ChevronDown className="h-4 w-4" />
+            History
+          </Button>
+          
+          <div className="space-y-2 pl-2">
+            {chatHistory.map((chat) => (
+              <div 
+                key={chat.id} 
+                className="flex items-start gap-3 py-2 px-3 hover:bg-muted rounded-lg cursor-pointer transition-colors group"
+              >
+                <MessageCircle className="h-4 w-4 mt-0.5 text-muted-foreground" />
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium truncate">{chat.title}</p>
+                  <p className="text-xs text-muted-foreground truncate">{chat.preview}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="space-y-3">
+          <Button variant="ghost" className="w-full justify-start gap-2 font-semibold">
+            <ChevronDown className="h-4 w-4" />
             Folders
           </Button>
           
           <div className="space-y-2 pl-2">
             {folders.map((folder, i) => (
               <div key={i} className="flex items-center gap-3 py-2 px-3 hover:bg-muted rounded-lg cursor-pointer transition-colors">
-                <div className={`w-3 h-3 rounded-full ${folder.color}`}></div>
+                <Folder className="w-4 h-4 text-muted-foreground" />
                 <span className="text-sm">{folder.name}</span>
               </div>
             ))}

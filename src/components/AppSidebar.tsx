@@ -1,4 +1,4 @@
-import { LayoutDashboard, BookOpen, GraduationCap, MessageSquare, Calendar } from "lucide-react";
+import { LayoutDashboard, BookOpen, GraduationCap, MessageSquare, Calendar, ShoppingCart } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import {
   Sidebar,
@@ -17,6 +17,7 @@ const items = [
   { title: "Ai-tutor", url: "/ai-tutor", icon: GraduationCap },
   { title: "Chat", url: "/chat", icon: MessageSquare },
   { title: "Calendar", url: "/calendar", icon: Calendar },
+  { title: "Cart", url: "/cart", icon: ShoppingCart },
 ];
 
 export function AppSidebar() {

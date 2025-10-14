@@ -11,6 +11,7 @@ import Courses from "./pages/Courses";
 import AiTutor from "./pages/AiTutor";
 import Chat from "./pages/Chat";
 import Calendar from "./pages/Calendar";
+import Cart from "./pages/Cart";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -33,6 +34,7 @@ const App = () => (
                   <Route path="/ai-tutor" element={<AiTutor />} />
                   <Route path="/chat" element={<Chat />} />
                   <Route path="/calendar" element={<Calendar />} />
+                  <Route path="/cart" element={<Cart />} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>
               </main>
