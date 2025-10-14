@@ -4,8 +4,10 @@ import { Progress } from "@/components/ui/progress";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const Dashboard = () => {
+  const navigate = useNavigate();
   const currentDate = new Date();
   const weekDays = Array.from({ length: 7 }, (_, i) => {
     const date = new Date(currentDate);
@@ -145,7 +147,7 @@ const Dashboard = () => {
 
         <div className="space-y-6">
           {/* Calendar Widget */}
-          <Card className="p-6 hover:shadow-lg transition-shadow">
+          <Card className="p-6 hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate('/calendar')}>
             <div className="space-y-4">
               <div className="grid grid-cols-7 gap-2 mb-4">
                 {weekDays.map((day, i) => (
@@ -185,7 +187,7 @@ const Dashboard = () => {
           </Card>
 
           {/* Chat Widget */}
-          <Card className="p-6 hover:shadow-lg transition-shadow">
+          <Card className="p-6 hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate('/chat')}>
             <div className="space-y-4">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />

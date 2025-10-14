@@ -12,15 +12,25 @@ interface Message {
   content: string;
 }
 
+interface ChatHistoryItem {
+  id: number;
+  title: string;
+  preview: string;
+  messages: Message[];
+}
+
 const AiTutor = () => {
   const { toast } = useToast();
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [chatHistory, setChatHistory] = useState<{ id: number; title: string; preview: string }[]>([
-    { id: 1, title: "UI/UX Presentation", preview: "Помоги создать презентацию..." },
-    { id: 2, title: "Math Homework", preview: "Реши уравнение..." },
+  const [currentChatId, setCurrentChatId] = useState<number | null>(null);
+  const [chatHistory, setChatHistory] = useState<ChatHistoryItem[]>([
+    { id: 1, title: "UI/UX Presentation", preview: "Помоги создать презентацию...", messages: [] },
+    { id: 2, title: "Math Homework", preview: "Реши уравнение...", messages: [] },
   ]);
+  const [deletedChats, setDeletedChats] = useState<ChatHistoryItem[]>([]);
+  const [showTrash, setShowTrash] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -39,12 +49,21 @@ const AiTutor = () => {
 
     // Add to chat history if it's the first message
     if (messages.length === 0) {
-      const newChat = {
-        id: Date.now(),
+      const chatId = Date.now();
+      const newChat: ChatHistoryItem = {
+        id: chatId,
         title: textToSend.slice(0, 30) + (textToSend.length > 30 ? '...' : ''),
-        preview: textToSend.slice(0, 50) + (textToSend.length > 50 ? '...' : '')
+        preview: textToSend.slice(0, 50) + (textToSend.length > 50 ? '...' : ''),
+        messages: [userMessage]
       };
       setChatHistory(prev => [newChat, ...prev]);
+      setCurrentChatId(chatId);
+    } else if (currentChatId) {
+      setChatHistory(prev => prev.map(chat => 
+        chat.id === currentChatId 
+          ? { ...chat, messages: [...messages, userMessage] }
+          : chat
+      ));
     }
 
     try {
@@ -112,6 +131,40 @@ const AiTutor = () => {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleRestoreChat = (chat: ChatHistoryItem) => {
+    setMessages(chat.messages);
+    setCurrentChatId(chat.id);
+    setShowTrash(false);
+  };
+
+  const handleMoveToTrash = () => {
+    if (currentChatId && messages.length > 0) {
+      const chatToDelete = chatHistory.find(chat => chat.id === currentChatId);
+      if (chatToDelete) {
+        const updatedChat = { ...chatToDelete, messages };
+        setDeletedChats(prev => [updatedChat, ...prev]);
+        setChatHistory(prev => prev.filter(chat => chat.id !== currentChatId));
+        setMessages([]);
+        setCurrentChatId(null);
+        toast({
+          title: "Чат перемещен в корзину",
+          description: "Вы можете восстановить его позже",
+        });
+      }
+    }
+  };
+
+  const handleRestoreFromTrash = (chat: ChatHistoryItem) => {
+    setMessages(chat.messages);
+    setCurrentChatId(chat.id);
+    setChatHistory(prev => [chat, ...prev]);
+    setDeletedChats(prev => prev.filter(c => c.id !== chat.id));
+    setShowTrash(false);
+    toast({
+      title: "Чат восстановлен",
+    });
   };
 
   const quickActions = [
@@ -258,10 +311,24 @@ const AiTutor = () => {
               <LayoutDashboard className="h-5 w-5" />
               Explore AI-tutor
             </Button>
-            <Button variant="secondary" className="w-full justify-start gap-3">
+            <Button 
+              variant="secondary" 
+              className="w-full justify-start gap-3"
+              onClick={() => setShowTrash(!showTrash)}
+            >
               <Trash2 className="h-5 w-5" />
-              Trash
+              Trash {deletedChats.length > 0 && `(${deletedChats.length})`}
             </Button>
+            {messages.length > 0 && currentChatId && (
+              <Button 
+                variant="secondary" 
+                className="w-full justify-start gap-3"
+                onClick={handleMoveToTrash}
+              >
+                <Trash2 className="h-5 w-5" />
+                Удалить текущий чат
+              </Button>
+            )}
             <Button variant="secondary" className="w-full justify-start gap-3">
               <ImageIcon className="h-5 w-5" />
               Gallery
@@ -269,27 +336,57 @@ const AiTutor = () => {
           </TabsContent>
         </Tabs>
 
-        <div className="space-y-3">
-          <Button variant="ghost" className="w-full justify-start gap-2 font-semibold">
-            <ChevronDown className="h-4 w-4" />
-            History
-          </Button>
-          
-          <div className="space-y-2 pl-2">
-            {chatHistory.map((chat) => (
-              <div 
-                key={chat.id} 
-                className="flex items-start gap-3 py-2 px-3 hover:bg-muted rounded-lg cursor-pointer transition-colors group"
-              >
-                <MessageCircle className="h-4 w-4 mt-0.5 text-muted-foreground" />
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium truncate">{chat.title}</p>
-                  <p className="text-xs text-muted-foreground truncate">{chat.preview}</p>
+        {!showTrash ? (
+          <div className="space-y-3">
+            <Button variant="ghost" className="w-full justify-start gap-2 font-semibold">
+              <ChevronDown className="h-4 w-4" />
+              History
+            </Button>
+            
+            <div className="space-y-2 pl-2">
+              {chatHistory.map((chat) => (
+                <div 
+                  key={chat.id} 
+                  className="flex items-start gap-3 py-2 px-3 hover:bg-muted rounded-lg cursor-pointer transition-colors group"
+                  onClick={() => handleRestoreChat(chat)}
+                >
+                  <MessageCircle className="h-4 w-4 mt-0.5 text-muted-foreground" />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium truncate">{chat.title}</p>
+                    <p className="text-xs text-muted-foreground truncate">{chat.preview}</p>
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
+        ) : (
+          <div className="space-y-3">
+            <Button variant="ghost" className="w-full justify-start gap-2 font-semibold">
+              <Trash2 className="h-4 w-4" />
+              Корзина
+            </Button>
+            
+            <div className="space-y-2 pl-2">
+              {deletedChats.length === 0 ? (
+                <p className="text-sm text-muted-foreground px-3 py-2">Корзина пуста</p>
+              ) : (
+                deletedChats.map((chat) => (
+                  <div 
+                    key={chat.id} 
+                    className="flex items-start gap-3 py-2 px-3 hover:bg-muted rounded-lg cursor-pointer transition-colors group"
+                    onClick={() => handleRestoreFromTrash(chat)}
+                  >
+                    <MessageCircle className="h-4 w-4 mt-0.5 text-muted-foreground" />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium truncate">{chat.title}</p>
+                      <p className="text-xs text-muted-foreground truncate">{chat.preview}</p>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        )}
 
         <div className="space-y-3">
           <Button variant="ghost" className="w-full justify-start gap-2 font-semibold">
