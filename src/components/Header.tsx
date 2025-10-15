@@ -7,8 +7,15 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Award, Info, HelpCircle, LogOut } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 export function Header() {
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.removeItem("isAuthenticated");
+    navigate("/auth");
+  };
   return (
     <header className="fixed top-0 right-0 left-0 h-16 border-b border-border bg-background z-50 flex items-center justify-between px-6">
       <SidebarTrigger className="ml-2" />
@@ -35,7 +42,7 @@ export function Header() {
             <HelpCircle className="mr-2 h-4 w-4" />
             <span>FAQ</span>
           </DropdownMenuItem>
-          <DropdownMenuItem className="text-destructive">
+          <DropdownMenuItem className="text-destructive" onClick={handleLogout}>
             <LogOut className="mr-2 h-4 w-4" />
             <span>Log out</span>
           </DropdownMenuItem>
