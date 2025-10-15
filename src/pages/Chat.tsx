@@ -2,11 +2,13 @@ import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { ChevronDown, Paperclip, Mic, Send } from "lucide-react";
+import { ChevronDown, Paperclip, Mic, Send, Search, Moon, BellOff, Settings, X } from "lucide-react";
 
 const Chat = () => {
   const [selectedChat, setSelectedChat] = useState("Chat");
   const [messageInput, setMessageInput] = useState("");
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   const [messages, setMessages] = useState([
     { sender: "Человек 1", text: "Hello!", type: "other" },
     { sender: "Person 2", text: "Hi there", type: "other" },
@@ -43,7 +45,11 @@ const Chat = () => {
       {/* Left Sidebar - Contacts */}
       <div className="w-80 border-r bg-card">
         <div className="p-4 border-b">
-          <Button variant="ghost" className="w-full justify-start gap-2">
+          <Button 
+            variant="ghost" 
+            className="w-full justify-start gap-2"
+            onClick={() => setSearchOpen(true)}
+          >
             Open
             <ChevronDown className="h-4 w-4 ml-auto" />
           </Button>
@@ -155,6 +161,118 @@ const Chat = () => {
           </div>
         </div>
       </div>
+
+      {/* Search Overlay */}
+      {searchOpen && (
+        <div className="fixed inset-0 bg-background z-50 animate-fade-in">
+          <div className="flex h-full">
+            {/* Contact List Sidebar */}
+            <div className="w-80 border-r flex flex-col">
+              <div className="p-4 space-y-4">
+                <div className="flex items-center justify-between">
+                  <Button 
+                    variant="ghost" 
+                    onClick={() => setSearchOpen(false)}
+                    className="font-semibold"
+                  >
+                    Open <ChevronDown className="ml-1 h-4 w-4" />
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    size="icon"
+                    onClick={() => setSearchOpen(false)}
+                  >
+                    <X className="h-5 w-5" />
+                  </Button>
+                </div>
+                {contacts.map((contact, index) => (
+                  <div
+                    key={index}
+                    onClick={() => {
+                      setSelectedChat(contact.name);
+                      setSearchOpen(false);
+                    }}
+                    className="flex items-center gap-3 p-3 hover:bg-muted rounded-lg cursor-pointer transition-colors"
+                  >
+                    <Avatar>
+                      <AvatarFallback>{contact.name[0]}</AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between gap-2">
+                        <h3 className="font-semibold text-sm">{contact.name}</h3>
+                        <span className="text-xs text-muted-foreground">{contact.time}</span>
+                      </div>
+                      <p className="text-sm text-muted-foreground truncate">{contact.message}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Search Panel */}
+            <div className="flex-1 flex flex-col p-6">
+              <div className="max-w-2xl w-full mx-auto space-y-6">
+                <div className="flex items-center gap-4">
+                  <div className="relative flex-1">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                    <Input
+                      placeholder="Search"
+                      className="pl-10 h-12"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      autoFocus
+                    />
+                  </div>
+                  <Avatar className="w-12 h-12">
+                    <AvatarFallback>U</AvatarFallback>
+                  </Avatar>
+                </div>
+
+                <div className="space-y-6">
+                  <div>
+                    <h3 className="text-sm font-semibold mb-4">Actions</h3>
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-3 p-3 hover:bg-muted rounded-lg cursor-pointer">
+                        <Moon className="h-5 w-5 text-muted-foreground" />
+                        <span>Do not disturb</span>
+                      </div>
+                      <div className="flex items-center gap-3 p-3 hover:bg-muted rounded-lg cursor-pointer">
+                        <BellOff className="h-5 w-5 text-muted-foreground" />
+                        <span>Pause Notification</span>
+                      </div>
+                      <div className="flex items-center gap-3 p-3 hover:bg-muted rounded-lg cursor-pointer">
+                        <Settings className="h-5 w-5 text-muted-foreground" />
+                        <span>Settings</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <h3 className="text-sm font-semibold mb-4">Suggestions</h3>
+                    <div className="space-y-2">
+                      {["Person 1", "Person 2", "Person 3"].map((person, i) => (
+                        <div
+                          key={i}
+                          className="flex items-center gap-3 p-3 hover:bg-muted rounded-lg cursor-pointer"
+                        >
+                          <Avatar>
+                            <AvatarFallback>{person[0]}</AvatarFallback>
+                          </Avatar>
+                          <span>{person}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div>
+                    <h3 className="text-sm font-semibold mb-4">Others</h3>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

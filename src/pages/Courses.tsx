@@ -12,6 +12,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 const Courses = () => {
   const [activeTab, setActiveTab] = useState("popular");
   const [showCreateCourse, setShowCreateCourse] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults] = useState({
+    last: ["Leadership and comunication", "Speaking", "UI/UX Design"],
+    others: ["Speaking", "Speaking"]
+  });
   const [courseTags, setCourseTags] = useState(["Design", "UI/UX", "Web app"]);
   const [coverImage, setCoverImage] = useState<string | null>(null);
   const [courseName, setCourseName] = useState("Design for beginners");
@@ -68,7 +74,11 @@ const Courses = () => {
       <div className="flex items-center gap-4">
         <div className="relative flex-1 max-w-2xl">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-          <Input placeholder="Search" className="pl-10" />
+          <Input 
+            placeholder="Search" 
+            className="pl-10"
+            onFocus={() => setSearchOpen(true)}
+          />
         </div>
         <Button variant="outline" size="icon">
           <Filter className="h-5 w-5" />
@@ -292,6 +302,71 @@ const Courses = () => {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Search Overlay */}
+      {searchOpen && (
+        <div className="fixed inset-0 bg-background/95 z-50 animate-fade-in">
+          <div className="container max-w-4xl mx-auto p-6 space-y-6">
+            <div className="flex items-center gap-4">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                <Input
+                  placeholder="Search"
+                  className="pl-10 h-12 text-lg"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  autoFocus
+                />
+              </div>
+              <Button variant="outline" size="icon">
+                <Filter className="h-5 w-5" />
+              </Button>
+              <Button variant="outline" size="icon">
+                <Bookmark className="h-5 w-5" />
+              </Button>
+              <Button 
+                variant="ghost" 
+                size="icon"
+                onClick={() => setSearchOpen(false)}
+              >
+                <X className="h-5 w-5" />
+              </Button>
+            </div>
+
+            <div className="space-y-6">
+              <div>
+                <h3 className="text-sm font-semibold text-muted-foreground mb-3">Last</h3>
+                <div className="space-y-2">
+                  {searchResults.last.map((item, i) => (
+                    <div
+                      key={i}
+                      className="flex items-center gap-3 p-3 rounded-lg hover:bg-muted cursor-pointer transition-colors"
+                    >
+                      <div className="w-12 h-12 bg-muted-foreground/20 rounded" />
+                      <span className="font-medium">{item}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <h3 className="text-sm font-semibold text-muted-foreground mb-3">Others</h3>
+                <div className="space-y-2">
+                  {searchResults.others.map((item, i) => (
+                    <div
+                      key={i}
+                      className="flex items-center gap-3 p-3 rounded-lg hover:bg-muted cursor-pointer transition-colors"
+                    >
+                      <div className="w-12 h-12 bg-muted-foreground/20 rounded" />
+                      <span className="font-medium">{item}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
