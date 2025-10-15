@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { User, Mail, Lock, Eye, EyeOff } from "lucide-react";
+import authBackground from "@/assets/auth-background.png";
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -27,7 +28,10 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[hsl(175,30%,85%)] to-[hsl(175,25%,75%)] p-4">
+    <div 
+      className="min-h-screen flex items-center justify-center p-4 bg-cover bg-center bg-no-repeat"
+      style={{ backgroundImage: `url(${authBackground})` }}
+    >
       <div className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
         {/* Form Section */}
         <div className="bg-card rounded-2xl shadow-2xl p-8 max-w-md w-full mx-auto">
@@ -158,53 +162,6 @@ const Auth = () => {
           </p>
         </div>
 
-        {/* Illustration Section */}
-        <div className="hidden lg:flex items-center justify-center">
-          <div className="relative w-full max-w-lg">
-            <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-accent/20 rounded-full blur-3xl"></div>
-            <svg viewBox="0 0 500 500" className="w-full h-auto relative z-10">
-              {/* Student illustration */}
-              <circle cx="250" cy="250" r="200" fill="hsl(175, 40%, 88%)" />
-              
-              {/* Books */}
-              <rect x="80" y="380" width="80" height="15" rx="2" fill="hsl(175, 60%, 35%)" />
-              <rect x="85" y="365" width="70" height="15" rx="2" fill="hsl(175, 60%, 40%)" />
-              <rect x="90" y="350" width="60" height="15" rx="2" fill="hsl(175, 60%, 45%)" />
-              
-              {/* Open book */}
-              <path d="M 200 420 L 200 360 L 280 365 L 280 425 Z" fill="hsl(0, 0%, 95%)" />
-              <path d="M 280 420 L 280 360 L 360 365 L 360 425 Z" fill="hsl(0, 0%, 98%)" />
-              <line x1="280" y1="360" x2="280" y2="425" stroke="hsl(175, 60%, 40%)" strokeWidth="3" />
-              
-              {/* Person */}
-              <ellipse cx="280" cy="200" rx="70" ry="80" fill="hsl(175, 50%, 55%)" />
-              <circle cx="280" cy="150" r="50" fill="hsl(30, 40%, 70%)" />
-              <circle cx="260" cy="145" r="8" fill="hsl(0, 0%, 20%)" />
-              <circle cx="300" cy="145" r="8" fill="hsl(0, 0%, 20%)" />
-              <path d="M 260 165 Q 280 175 300 165" stroke="hsl(0, 0%, 20%)" strokeWidth="2" fill="none" />
-              
-              {/* Glasses */}
-              <circle cx="260" cy="145" r="18" fill="none" stroke="hsl(0, 0%, 20%)" strokeWidth="3" />
-              <circle cx="300" cy="145" r="18" fill="none" stroke="hsl(0, 0%, 20%)" strokeWidth="3" />
-              <line x1="278" y1="145" x2="282" y2="145" stroke="hsl(0, 0%, 20%)" strokeWidth="3" />
-              
-              {/* Hair */}
-              <path d="M 230 120 Q 220 100 230 80 Q 250 60 280 60 Q 310 60 330 80 Q 340 100 330 120 Z" fill="hsl(180, 30%, 25%)" />
-              
-              {/* Pen */}
-              <rect x="320" y="320" width="8" height="60" rx="4" fill="hsl(200, 70%, 50%)" transform="rotate(-25 324 350)" />
-              
-              {/* Education icons */}
-              <path d="M 380 100 L 420 120 L 420 140 L 380 160 L 340 140 L 340 120 Z" fill="hsl(175, 60%, 70%)" />
-              <rect x="375" y="142" width="10" height="25" fill="hsl(175, 60%, 70%)" />
-              
-              {/* Atom icon */}
-              <circle cx="160" cy="120" r="8" fill="hsl(175, 60%, 50%)" />
-              <ellipse cx="160" cy="120" rx="35" ry="15" fill="none" stroke="hsl(175, 60%, 50%)" strokeWidth="3" transform="rotate(45 160 120)" />
-              <ellipse cx="160" cy="120" rx="35" ry="15" fill="none" stroke="hsl(175, 60%, 50%)" strokeWidth="3" transform="rotate(-45 160 120)" />
-            </svg>
-          </div>
-        </div>
       </div>
     </div>
   );
