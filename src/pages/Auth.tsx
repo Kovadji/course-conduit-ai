@@ -61,18 +61,10 @@ const Auth = () => {
     }
   };
 
-  const handleSocialLogin = async (provider: 'google' | 'apple') => {
-    try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: provider as any,
-        options: {
-          redirectTo: `${window.location.origin}/`,
-        },
-      });
-      if (error) throw error;
-    } catch (error: any) {
-      toast.error(error.message);
-    }
+  const handleSocialLogin = (provider: 'google' | 'apple') => {
+    // Временный вход без OAuth для тестирования
+    localStorage.setItem("isAuthenticated", "true");
+    navigate("/");
   };
 
   return (
