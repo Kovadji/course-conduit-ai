@@ -157,9 +157,10 @@ const Chat = () => {
               onClick={() => {
                 setSelectedChat(contact.name);
                 setSelectedConversationId(contact.id);
+                setSearchOpen(false);
               }}
               className={`flex items-center gap-3 p-4 hover:bg-muted cursor-pointer transition-colors ${
-                selectedChat === contact.name ? "bg-muted" : ""
+                selectedConversationId === contact.id ? "bg-muted" : ""
               }`}
             >
               <Avatar className="h-12 w-12">
@@ -196,11 +197,22 @@ const Chat = () => {
 
         {/* Messages */}
         <div className="flex-1 overflow-y-auto p-6 space-y-6">
-          <div className="text-center">
-            <span className="text-xs text-muted-foreground">Today</span>
-          </div>
+          {!selectedConversationId ? (
+            <div className="flex items-center justify-center h-full">
+              <div className="text-center space-y-2">
+                <p className="text-muted-foreground">Выберите чат для начала общения</p>
+                <Button onClick={() => setSearchOpen(true)} variant="outline">
+                  Открыть список контактов
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <>
+              <div className="text-center">
+                <span className="text-xs text-muted-foreground">Today</span>
+              </div>
 
-          {messages.map((message, i) => (
+              {messages.map((message, i) => (
             <div
               key={i}
               className={`flex gap-3 ${
@@ -235,9 +247,12 @@ const Chat = () => {
               )}
             </div>
           ))}
+            </>
+          )}
         </div>
 
         {/* Input Area */}
+        {selectedConversationId && (
         <div className="border-t p-4">
           <div className="flex items-center gap-3 max-w-4xl mx-auto">
             <Input
@@ -258,6 +273,7 @@ const Chat = () => {
             </Button>
           </div>
         </div>
+        )}
       </div>
 
       {/* Search Overlay */}
