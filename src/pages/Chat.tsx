@@ -2,9 +2,11 @@ import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { ChevronDown, Paperclip, Mic, Send, Search, Moon, BellOff, Settings, X } from "lucide-react";
+import { ChevronDown, Paperclip, Mic, Send, Search, Moon, BellOff, Settings, X, Plus, UserPlus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
 
 const Chat = () => {
   const [selectedChat, setSelectedChat] = useState<string | null>(null);
@@ -14,6 +16,8 @@ const Chat = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [messages, setMessages] = useState<any[]>([]);
   const [contacts, setContacts] = useState<any[]>([]);
+  const [showCreateContact, setShowCreateContact] = useState(false);
+  const [newContactName, setNewContactName] = useState("");
 
   useEffect(() => {
     loadConversations();
@@ -62,6 +66,45 @@ const Chat = () => {
         text: msg.content,
         type: msg.sender === "You" ? "self" : "other"
       })));
+    }
+  };
+
+  const handleCreateContact = async () => {
+    if (!newContactName.trim()) {
+      toast.error("Введите имя контакта");
+      return;
+    }
+
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      toast.error("Необходимо войти в систему");
+      return;
+    }
+
+    const { data, error } = await supabase
+      .from('chat_conversations')
+      .insert({
+        user_id: user.id,
+        contact_name: newContactName
+      })
+      .select()
+      .single();
+
+    if (error) {
+      toast.error("Ошибка создания контакта");
+      console.error(error);
+    } else {
+      toast.success("Контакт создан!");
+      setNewContactName("");
+      setShowCreateContact(false);
+      loadConversations();
+      
+      // Автоматически открываем новый чат
+      if (data) {
+        setSelectedChat(data.contact_name);
+        setSelectedConversationId(data.id);
+        setSearchOpen(false);
+      }
     }
   };
 
@@ -322,6 +365,17 @@ const Chat = () => {
 
                   <div>
                     <h3 className="text-sm font-semibold mb-4">Others</h3>
+                    <Button 
+                      onClick={() => {
+                        setShowCreateContact(true);
+                        setSearchOpen(false);
+                      }}
+                      className="w-full"
+                      variant="outline"
+                    >
+                      <UserPlus className="h-5 w-5 mr-2" />
+                      Создать новый контакт
+                    </Button>
                   </div>
                 </div>
               </div>
@@ -329,6 +383,34 @@ const Chat = () => {
           </div>
         </div>
       )}
+
+      {/* Create Contact Dialog */}
+      <Dialog open={showCreateContact} onOpenChange={setShowCreateContact}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Создать новый контакт</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="contact-name">Имя контакта</Label>
+              <Input
+                id="contact-name"
+                placeholder="Введите имя"
+                value={newContactName}
+                onChange={(e) => setNewContactName(e.target.value)}
+                onKeyPress={(e) => {
+                  if (e.key === 'Enter') {
+                    handleCreateContact();
+                  }
+                }}
+              />
+            </div>
+            <Button onClick={handleCreateContact} className="w-full">
+              Создать
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
