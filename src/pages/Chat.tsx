@@ -108,6 +108,45 @@ const Chat = () => {
     }
   };
 
+  const handleSelectSuggestion = async (personName: string) => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      toast.error("Необходимо войти в систему");
+      return;
+    }
+
+    // Проверяем, существует ли уже такой контакт
+    const existingContact = contacts.find(c => c.name === personName);
+    
+    if (existingContact) {
+      // Если контакт уже есть, просто открываем чат
+      setSelectedChat(existingContact.name);
+      setSelectedConversationId(existingContact.id);
+      setSearchOpen(false);
+    } else {
+      // Если контакта нет, создаем новый
+      const { data, error } = await supabase
+        .from('chat_conversations')
+        .insert({
+          user_id: user.id,
+          contact_name: personName
+        })
+        .select()
+        .single();
+
+      if (error) {
+        toast.error("Ошибка создания контакта");
+        console.error(error);
+      } else if (data) {
+        toast.success(`Чат с ${personName} создан!`);
+        loadConversations();
+        setSelectedChat(data.contact_name);
+        setSelectedConversationId(data.id);
+        setSearchOpen(false);
+      }
+    }
+  };
+
   const handleSendMessage = async () => {
     if (messageInput.trim() && selectedConversationId) {
       const { error } = await supabase
@@ -284,13 +323,7 @@ const Chat = () => {
             <div className="w-80 border-r flex flex-col">
               <div className="p-4 space-y-4">
                 <div className="flex items-center justify-between">
-                  <Button 
-                    variant="ghost" 
-                    onClick={() => setSearchOpen(false)}
-                    className="font-semibold"
-                  >
-                    Open <ChevronDown className="ml-1 h-4 w-4" />
-                  </Button>
+                  <h2 className="font-semibold text-lg">Контакты</h2>
                   <Button 
                     variant="ghost" 
                     size="icon"
@@ -368,6 +401,7 @@ const Chat = () => {
                       {["Person 1", "Person 2", "Person 3"].map((person, i) => (
                         <div
                           key={i}
+                          onClick={() => handleSelectSuggestion(person)}
                           className="flex items-center gap-3 p-3 hover:bg-muted rounded-lg cursor-pointer"
                         >
                           <Avatar>
