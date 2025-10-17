@@ -1,35 +1,87 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { ChevronDown, Paperclip, Mic, Send, Search, Moon, BellOff, Settings, X } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 const Chat = () => {
-  const [selectedChat, setSelectedChat] = useState("Chat");
+  const [selectedChat, setSelectedChat] = useState<string | null>(null);
+  const [selectedConversationId, setSelectedConversationId] = useState<string | null>(null);
   const [messageInput, setMessageInput] = useState("");
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [messages, setMessages] = useState([
-    { sender: "Человек 1", text: "Hello!", type: "other" },
-    { sender: "Person 2", text: "Hi there", type: "other" },
-    { sender: "Человек 1", text: "How are you?", type: "other" },
-    { sender: "You", text: "I'm good, thanks!", type: "self" },
-  ]);
+  const [messages, setMessages] = useState<any[]>([]);
+  const [contacts, setContacts] = useState<any[]>([]);
 
-  const contacts = [
-    { name: "Person 1", message: "Axaaxax", time: "5 min ago" },
-    { name: "Person 2", message: "пон", time: "30 min ago" },
-    { name: "Person 3", message: "дану", time: "45 min ago" },
-    { name: "Person 4", message: "О да! давай окунимся в ...", time: "45 min ago" },
-    { name: "Chat", message: "Hello there!", time: "2 hour ago" },
-    { name: "Байсал агай", message: "Ғылым жоба қалай?", time: "5 hour ago" },
-    { name: "Тайр ага", message: "yaранейкум у тебя 4", time: "1 day ago" },
-  ];
+  useEffect(() => {
+    loadConversations();
+  }, []);
 
-  const handleSendMessage = () => {
-    if (messageInput.trim()) {
-      setMessages([...messages, { sender: "You", text: messageInput, type: "self" }]);
-      setMessageInput("");
+  useEffect(() => {
+    if (selectedConversationId) {
+      loadMessages(selectedConversationId);
+    }
+  }, [selectedConversationId]);
+
+  const loadConversations = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    const { data, error } = await supabase
+      .from('chat_conversations')
+      .select('*')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error(error);
+    } else if (data) {
+      setContacts(data.map(conv => ({
+        id: conv.id,
+        name: conv.contact_name,
+        message: "Последнее сообщение",
+        time: new Date(conv.created_at).toLocaleString('ru-RU')
+      })));
+    }
+  };
+
+  const loadMessages = async (conversationId: string) => {
+    const { data, error } = await supabase
+      .from('messages')
+      .select('*')
+      .eq('conversation_id', conversationId)
+      .order('created_at', { ascending: true });
+
+    if (error) {
+      console.error(error);
+    } else if (data) {
+      setMessages(data.map(msg => ({
+        sender: msg.sender,
+        text: msg.content,
+        type: msg.sender === "You" ? "self" : "other"
+      })));
+    }
+  };
+
+  const handleSendMessage = async () => {
+    if (messageInput.trim() && selectedConversationId) {
+      const { error } = await supabase
+        .from('messages')
+        .insert({
+          conversation_id: selectedConversationId,
+          sender: "You",
+          content: messageInput
+        });
+
+      if (error) {
+        toast.error("Ошибка отправки сообщения");
+        console.error(error);
+      } else {
+        loadMessages(selectedConversationId);
+        setMessageInput("");
+      }
     }
   };
 
@@ -59,7 +111,10 @@ const Chat = () => {
           {contacts.map((contact, i) => (
             <div
               key={i}
-              onClick={() => setSelectedChat(contact.name)}
+              onClick={() => {
+                setSelectedChat(contact.name);
+                setSelectedConversationId(contact.id);
+              }}
               className={`flex items-center gap-3 p-4 hover:bg-muted cursor-pointer transition-colors ${
                 selectedChat === contact.name ? "bg-muted" : ""
               }`}
@@ -87,11 +142,11 @@ const Chat = () => {
         <div className="h-16 border-b px-6 flex items-center gap-4">
           <Avatar className="h-10 w-10">
             <AvatarFallback className="bg-muted-foreground/20">
-              {selectedChat.charAt(0)}
+              {selectedChat?.charAt(0) || "?"}
             </AvatarFallback>
           </Avatar>
           <div>
-            <h2 className="font-semibold">{selectedChat}</h2>
+            <h2 className="font-semibold">{selectedChat || "Выберите чат"}</h2>
             <p className="text-xs text-muted-foreground">4 members, 2 online</p>
           </div>
         </div>
@@ -187,9 +242,10 @@ const Chat = () => {
                 </div>
                 {contacts.map((contact, index) => (
                   <div
-                    key={index}
+                   key={index}
                     onClick={() => {
                       setSelectedChat(contact.name);
+                      setSelectedConversationId(contact.id);
                       setSearchOpen(false);
                     }}
                     className="flex items-center gap-3 p-3 hover:bg-muted rounded-lg cursor-pointer transition-colors"
