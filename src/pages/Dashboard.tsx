@@ -34,7 +34,7 @@ const Dashboard = () => {
         <div className="lg:col-span-2 space-y-6">
           {/* Test Results and Upcoming Course */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Card className="p-6 hover:shadow-lg transition-shadow">
+            <Card className="p-6 hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate('/tests')}>
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <Select defaultValue="math">
