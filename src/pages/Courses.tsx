@@ -67,16 +67,11 @@ const Courses = () => {
 
   const handleCreateCourse = async () => {
     const { data: { user } } = await supabase.auth.getUser();
-    
-    if (!user) {
-      toast.error("Необходимо войти в систему");
-      return;
-    }
 
     const { error } = await supabase
       .from('courses')
       .insert({
-        user_id: user.id,
+        user_id: user?.id || '00000000-0000-0000-0000-000000000000',
         title: courseName,
         description: courseDescription,
         price: parseFloat(coursePrice),

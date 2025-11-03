@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { ChevronDown, Paperclip, Mic, Send, Search, Moon, BellOff, Settings, X, Plus, UserPlus } from "lucide-react";
+import { Paperclip, Mic, Send, Search, Moon, BellOff, Settings, X, Plus, UserPlus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -76,15 +76,11 @@ const Chat = () => {
     }
 
     const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      toast.error("Необходимо войти в систему");
-      return;
-    }
 
     const { data, error } = await supabase
       .from('chat_conversations')
       .insert({
-        user_id: user.id,
+        user_id: user?.id || '00000000-0000-0000-0000-000000000000',
         contact_name: newContactName
       })
       .select()
@@ -110,10 +106,6 @@ const Chat = () => {
 
   const handleSelectSuggestion = async (personName: string) => {
     const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      toast.error("Необходимо войти в систему");
-      return;
-    }
 
     // Проверяем, существует ли уже такой контакт
     const existingContact = contacts.find(c => c.name === personName);
@@ -128,7 +120,7 @@ const Chat = () => {
       const { data, error } = await supabase
         .from('chat_conversations')
         .insert({
-          user_id: user.id,
+          user_id: user?.id || '00000000-0000-0000-0000-000000000000',
           contact_name: personName
         })
         .select()
@@ -179,18 +171,32 @@ const Chat = () => {
       {/* Left Sidebar - Contacts */}
       <div className="w-80 border-r bg-card">
         <div className="p-4 border-b">
-          <Button 
-            variant="ghost" 
-            className="w-full justify-start gap-2"
-            onClick={() => setSearchOpen(true)}
-          >
-            Open
-            <ChevronDown className="h-4 w-4 ml-auto" />
-          </Button>
+          <div className="flex items-center justify-between">
+            <h2 className="text-xl font-semibold">Chats</h2>
+            <Button 
+              variant="ghost" 
+              size="icon"
+              onClick={() => setSearchOpen(true)}
+            >
+              <Search className="h-5 w-5" />
+            </Button>
+          </div>
         </div>
         
         <div className="overflow-y-auto h-[calc(100vh-8rem)]">
-          {contacts.map((contact, i) => (
+          {contacts.length === 0 ? (
+            <div className="p-4 text-center space-y-2">
+              <p className="text-sm text-muted-foreground">Нет чатов</p>
+              <Button 
+                variant="link" 
+                onClick={() => setSearchOpen(true)}
+                className="text-xs"
+              >
+                Создать контакт
+              </Button>
+            </div>
+          ) : (
+            contacts.map((contact, i) => (
             <div
               key={i}
               onClick={() => {
@@ -215,7 +221,8 @@ const Chat = () => {
                 <p className="text-sm text-muted-foreground truncate">{contact.message}</p>
               </div>
             </div>
-          ))}
+          ))
+          )}
         </div>
       </div>
 
