@@ -21,7 +21,35 @@ const Chat = () => {
 
   useEffect(() => {
     loadConversations();
+    createDefaultContacts();
   }, []);
+
+  const createDefaultContacts = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    const userId = user?.id || '00000000-0000-0000-0000-000000000000';
+
+    // Check if default contacts already exist
+    const { data: existing } = await supabase
+      .from('chat_conversations')
+      .select('*')
+      .eq('user_id', userId);
+
+    if (existing && existing.length > 0) return;
+
+    // Create default contacts
+    const defaultContacts = ['Person 1', 'Person 2', 'Person 3', 'Person 4'];
+    
+    for (const name of defaultContacts) {
+      await supabase
+        .from('chat_conversations')
+        .insert({
+          user_id: userId,
+          contact_name: name
+        });
+    }
+
+    loadConversations();
+  };
 
   useEffect(() => {
     if (selectedConversationId) {

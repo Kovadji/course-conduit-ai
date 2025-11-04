@@ -6,7 +6,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Award, Info, HelpCircle, LogOut } from "lucide-react";
+import { Award, Info, HelpCircle, LogOut, ClipboardList } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 export function Header() {
@@ -37,6 +37,10 @@ export function Header() {
           <DropdownMenuItem>
             <Info className="mr-2 h-4 w-4" />
             <span>About us</span>
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => navigate('/tests')}>
+            <ClipboardList className="mr-2 h-4 w-4" />
+            <span>Tests</span>
           </DropdownMenuItem>
           <DropdownMenuItem>
             <HelpCircle className="mr-2 h-4 w-4" />

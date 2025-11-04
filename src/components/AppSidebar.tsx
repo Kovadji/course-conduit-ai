@@ -1,4 +1,4 @@
-import { LayoutDashboard, BookOpen, GraduationCap, MessageSquare, Calendar, ShoppingCart } from "lucide-react";
+import { LayoutDashboard, BookOpen, GraduationCap, MessageSquare, Calendar, ShoppingCart, ClipboardList } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import {
   Sidebar,
