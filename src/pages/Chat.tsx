@@ -1,9 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Paperclip, Mic, Send, Search, Moon, BellOff, Settings, X, Plus, UserPlus } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { Paperclip, Mic, Send, Search, Moon, BellOff, Settings, X, UserPlus } from "lucide-react";
 import { toast } from "sonner";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
@@ -14,127 +13,41 @@ const Chat = () => {
   const [messageInput, setMessageInput] = useState("");
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [messages, setMessages] = useState<any[]>([]);
-  const [contacts, setContacts] = useState<any[]>([]);
+  const [messages, setMessages] = useState<Record<string, any[]>>({});
+  const [contacts, setContacts] = useState<any[]>([
+    { id: "1", name: "Person 1", message: "Ахаахах", time: "5 min ago" },
+    { id: "2", name: "Person 2", message: "пон", time: "30 min ago" },
+    { id: "3", name: "Person 3", message: "дану", time: "45 min ago" },
+    { id: "4", name: "Person 4", message: "О да! давай окунимся в ...", time: "45 min ago" },
+  ]);
   const [showCreateContact, setShowCreateContact] = useState(false);
   const [newContactName, setNewContactName] = useState("");
 
-  useEffect(() => {
-    loadConversations();
-    createDefaultContacts();
-  }, []);
-
-  const createDefaultContacts = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    const userId = user?.id || '00000000-0000-0000-0000-000000000000';
-
-    // Check if default contacts already exist
-    const { data: existing } = await supabase
-      .from('chat_conversations')
-      .select('*')
-      .eq('user_id', userId);
-
-    if (existing && existing.length > 0) return;
-
-    // Create default contacts
-    const defaultContacts = ['Person 1', 'Person 2', 'Person 3', 'Person 4'];
-    
-    for (const name of defaultContacts) {
-      await supabase
-        .from('chat_conversations')
-        .insert({
-          user_id: userId,
-          contact_name: name
-        });
-    }
-
-    loadConversations();
-  };
-
-  useEffect(() => {
-    if (selectedConversationId) {
-      loadMessages(selectedConversationId);
-    }
-  }, [selectedConversationId]);
-
-  const loadConversations = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
-
-    const { data, error } = await supabase
-      .from('chat_conversations')
-      .select('*')
-      .eq('user_id', user.id)
-      .order('created_at', { ascending: false });
-
-    if (error) {
-      console.error(error);
-    } else if (data) {
-      setContacts(data.map(conv => ({
-        id: conv.id,
-        name: conv.contact_name,
-        message: "Последнее сообщение",
-        time: new Date(conv.created_at).toLocaleString('ru-RU')
-      })));
-    }
-  };
-
-  const loadMessages = async (conversationId: string) => {
-    const { data, error } = await supabase
-      .from('messages')
-      .select('*')
-      .eq('conversation_id', conversationId)
-      .order('created_at', { ascending: true });
-
-    if (error) {
-      console.error(error);
-    } else if (data) {
-      setMessages(data.map(msg => ({
-        sender: msg.sender,
-        text: msg.content,
-        type: msg.sender === "You" ? "self" : "other"
-      })));
-    }
-  };
-
-  const handleCreateContact = async () => {
+  const handleCreateContact = () => {
     if (!newContactName.trim()) {
       toast.error("Введите имя контакта");
       return;
     }
 
-    const { data: { user } } = await supabase.auth.getUser();
+    const newContact = {
+      id: Date.now().toString(),
+      name: newContactName,
+      message: "Новый чат",
+      time: "now"
+    };
 
-    const { data, error } = await supabase
-      .from('chat_conversations')
-      .insert({
-        user_id: user?.id || '00000000-0000-0000-0000-000000000000',
-        contact_name: newContactName
-      })
-      .select()
-      .single();
-
-    if (error) {
-      toast.error("Ошибка создания контакта");
-      console.error(error);
-    } else {
-      toast.success("Контакт создан!");
-      setNewContactName("");
-      setShowCreateContact(false);
-      loadConversations();
-      
-      // Автоматически открываем новый чат
-      if (data) {
-        setSelectedChat(data.contact_name);
-        setSelectedConversationId(data.id);
-        setSearchOpen(false);
-      }
-    }
+    setContacts([newContact, ...contacts]);
+    toast.success("Контакт создан!");
+    setNewContactName("");
+    setShowCreateContact(false);
+    
+    // Автоматически открываем новый чат
+    setSelectedChat(newContact.name);
+    setSelectedConversationId(newContact.id);
+    setSearchOpen(false);
   };
 
-  const handleSelectSuggestion = async (personName: string) => {
-    const { data: { user } } = await supabase.auth.getUser();
-
+  const handleSelectSuggestion = (personName: string) => {
     // Проверяем, существует ли уже такой контакт
     const existingContact = contacts.find(c => c.name === personName);
     
@@ -145,45 +58,35 @@ const Chat = () => {
       setSearchOpen(false);
     } else {
       // Если контакта нет, создаем новый
-      const { data, error } = await supabase
-        .from('chat_conversations')
-        .insert({
-          user_id: user?.id || '00000000-0000-0000-0000-000000000000',
-          contact_name: personName
-        })
-        .select()
-        .single();
-
-      if (error) {
-        toast.error("Ошибка создания контакта");
-        console.error(error);
-      } else if (data) {
-        toast.success(`Чат с ${personName} создан!`);
-        loadConversations();
-        setSelectedChat(data.contact_name);
-        setSelectedConversationId(data.id);
-        setSearchOpen(false);
-      }
+      const newContact = {
+        id: Date.now().toString(),
+        name: personName,
+        message: "Новый чат",
+        time: "now"
+      };
+      
+      setContacts([newContact, ...contacts]);
+      toast.success(`Чат с ${personName} создан!`);
+      setSelectedChat(newContact.name);
+      setSelectedConversationId(newContact.id);
+      setSearchOpen(false);
     }
   };
 
-  const handleSendMessage = async () => {
+  const handleSendMessage = () => {
     if (messageInput.trim() && selectedConversationId) {
-      const { error } = await supabase
-        .from('messages')
-        .insert({
-          conversation_id: selectedConversationId,
-          sender: "You",
-          content: messageInput
-        });
+      const newMessage = {
+        sender: "You",
+        text: messageInput,
+        type: "self"
+      };
 
-      if (error) {
-        toast.error("Ошибка отправки сообщения");
-        console.error(error);
-      } else {
-        loadMessages(selectedConversationId);
-        setMessageInput("");
-      }
+      setMessages({
+        ...messages,
+        [selectedConversationId]: [...(messages[selectedConversationId] || []), newMessage]
+      });
+      
+      setMessageInput("");
     }
   };
 
@@ -286,7 +189,7 @@ const Chat = () => {
                 <span className="text-xs text-muted-foreground">Today</span>
               </div>
 
-              {messages.map((message, i) => (
+              {(messages[selectedConversationId] || []).map((message, i) => (
             <div
               key={i}
               className={`flex gap-3 ${

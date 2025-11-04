@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -8,7 +8,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 const Courses = () => {
@@ -25,34 +24,18 @@ const Courses = () => {
   const [courseName, setCourseName] = useState("Design for beginners");
   const [courseDescription, setCourseDescription] = useState("Hi anyone! In this course you learn Design interfaces / Perfect UX / Launch projects");
   const [coursePrice, setCoursePrice] = useState("120");
-  const [courses, setCourses] = useState<any[]>([]);
-
-  useEffect(() => {
-    loadCourses();
-  }, []);
-
-  const loadCourses = async () => {
-    const { data, error } = await supabase
-      .from('courses')
-      .select('*')
-      .order('created_at', { ascending: false });
-    
-    if (error) {
-      toast.error("Ошибка загрузки курсов");
-      console.error(error);
-    } else if (data) {
-      setCourses(data.map(course => ({
-        id: course.id,
-        title: course.title,
-        price: course.price ? `${course.price}$` : "Бесплатно",
-        description: course.description || "",
-        students: course.student_count?.toString() || "0",
-        rating: course.rating || 5.0,
-        author: "Author",
-        image: course.cover_image_url || "gradient"
-      })));
+  const [courses, setCourses] = useState<any[]>([
+    {
+      id: "1",
+      title: "UI/UX design",
+      price: "120$",
+      description: "Design interfaces. Perfect UX. Launch projects.",
+      students: "9.5K",
+      rating: 4.3,
+      author: "zh.fair",
+      image: "gradient"
     }
-  };
+  ]);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -65,37 +48,28 @@ const Courses = () => {
     }
   };
 
-  const handleCreateCourse = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
+  const handleCreateCourse = () => {
+    const newCourse = {
+      id: Date.now().toString(),
+      title: courseName,
+      price: `${coursePrice}$`,
+      description: courseDescription,
+      students: "0",
+      rating: 5.0,
+      author: "Author",
+      image: coverImage || "gradient"
+    };
 
-    const { error } = await supabase
-      .from('courses')
-      .insert({
-        user_id: user?.id || '00000000-0000-0000-0000-000000000000',
-        title: courseName,
-        description: courseDescription,
-        price: parseFloat(coursePrice),
-        cover_image_url: coverImage,
-        tags: courseTags,
-        level: "beginner",
-        student_count: 0,
-        rating: 5.0
-      });
-
-    if (error) {
-      toast.error("Ошибка создания курса");
-      console.error(error);
-    } else {
-      toast.success("Курс успешно создан!");
-      loadCourses();
-      setShowCreateCourse(false);
-      // Reset form
-      setCourseName("Design for beginners");
-      setCourseDescription("Hi anyone! In this course you learn Design interfaces / Perfect UX / Launch projects");
-      setCoursePrice("120");
-      setCoverImage(null);
-      setCourseTags(["Design", "UI/UX", "Web app"]);
-    }
+    setCourses([newCourse, ...courses]);
+    toast.success("Курс успешно создан!");
+    setShowCreateCourse(false);
+    
+    // Reset form
+    setCourseName("Design for beginners");
+    setCourseDescription("Hi anyone! In this course you learn Design interfaces / Perfect UX / Launch projects");
+    setCoursePrice("120");
+    setCoverImage(null);
+    setCourseTags(["Design", "UI/UX", "Web app"]);
   };
 
   return (
