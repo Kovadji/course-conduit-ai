@@ -13,8 +13,6 @@ import Chat from "./pages/Chat";
 import Calendar from "./pages/Calendar";
 import Cart from "./pages/Cart";
 import Auth from "./pages/Auth";
-import Tests from "./pages/Tests";
-import TestTaking from "./pages/TestTaking";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -49,8 +47,6 @@ const App = () => (
                           <Route path="/chat" element={<Chat />} />
                           <Route path="/calendar" element={<Calendar />} />
                           <Route path="/cart" element={<Cart />} />
-                          <Route path="/tests" element={<Tests />} />
-                          <Route path="/test/:testId" element={<TestTaking />} />
                           <Route path="*" element={<NotFound />} />
                         </Routes>
                       </main>
