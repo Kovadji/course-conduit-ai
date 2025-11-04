@@ -8,6 +8,8 @@ import { AppSidebar } from "@/components/AppSidebar";
 import { Header } from "@/components/Header";
 import Dashboard from "./pages/Dashboard";
 import Courses from "./pages/Courses";
+import CourseDetail from "./pages/CourseDetail";
+import CourseLearn from "./pages/CourseLearn";
 import AiTutor from "./pages/AiTutor";
 import Chat from "./pages/Chat";
 import Calendar from "./pages/Calendar";
@@ -45,6 +47,8 @@ const App = () => (
                         <Routes>
                           <Route path="/" element={<Dashboard />} />
                           <Route path="/courses" element={<Courses />} />
+                          <Route path="/course/:courseId" element={<CourseDetail />} />
+                          <Route path="/course/:courseId/learn" element={<CourseLearn />} />
                           <Route path="/ai-tutor" element={<AiTutor />} />
                           <Route path="/chat" element={<Chat />} />
                           <Route path="/calendar" element={<Calendar />} />

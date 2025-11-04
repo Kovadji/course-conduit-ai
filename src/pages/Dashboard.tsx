@@ -82,7 +82,7 @@ const Dashboard = () => {
               </div>
             </Card>
 
-            <Card className="p-6 hover:shadow-lg transition-shadow">
+            <Card className="p-6 hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate('/course/1/learn')}>
               <div className="space-y-4">
                 <h3 className="text-xl font-semibold">Speaking</h3>
                 <p className="text-sm text-muted-foreground">Chapter 3 : Confident speaking and cohirance</p>

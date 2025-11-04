@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -11,6 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { toast } from "sonner";
 
 const Courses = () => {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("popular");
   const [showCreateCourse, setShowCreateCourse] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
@@ -133,7 +135,7 @@ const Courses = () => {
         <TabsContent value={activeTab} className="mt-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {courses.map((course) => (
-              <Card key={course.id} className="overflow-hidden hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+              <Card key={course.id} className="overflow-hidden hover:shadow-lg transition-all duration-300 hover:-translate-y-1 cursor-pointer" onClick={() => navigate(`/course/${course.id}`)}>
                 {course.image === "gradient" ? (
                   <div className="aspect-[4/3] bg-gradient-to-br from-purple-400 via-pink-500 to-orange-400 relative overflow-hidden">
                     <div className="absolute inset-0 flex items-center justify-center">
