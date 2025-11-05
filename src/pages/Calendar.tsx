@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { PomodoroTimer } from "@/components/PomodoroTimer";
 
 const Calendar = () => {
   const [view, setView] = useState<"month" | "week" | "day">("week");
@@ -384,8 +385,13 @@ const Calendar = () => {
         </div>
       </Card>
 
-      {/* Right Sidebar - Mini Calendar */}
+      {/* Right Sidebar - Mini Calendar and Pomodoro */}
       <div className="w-80 space-y-4">
+        {/* Pomodoro Timer */}
+        <Card className="p-6 bg-gradient-to-br from-primary/10 to-primary/5">
+          <PomodoroTimer />
+        </Card>
+        
         <Card className="p-4">
           <div className="flex items-center justify-between mb-4">
             <Button 

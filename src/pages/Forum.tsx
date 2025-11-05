@@ -63,9 +63,24 @@ const Forum = () => {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<"latest" | "hot" | "categories">("latest");
 
-  const filteredTopics = selectedCategory
+  // Filter and sort topics based on active tab
+  let filteredTopics = selectedCategory
     ? topics.filter((t) => t.category === selectedCategory)
     : topics;
+
+  // Sort based on active tab
+  if (activeTab === "hot") {
+    // Sort by views (most viewed first)
+    filteredTopics = [...filteredTopics].sort((a, b) => b.views - a.views);
+  } else if (activeTab === "latest") {
+    // Sort by last activity (most recent first)
+    filteredTopics = [...filteredTopics].sort((a, b) => {
+      // Pinned topics always first
+      if (a.isPinned && !b.isPinned) return -1;
+      if (!a.isPinned && b.isPinned) return 1;
+      return 0;
+    });
+  }
 
   const getCategoryName = (categoryId: string) => {
     return categories.find((c) => c.id === categoryId)?.name || categoryId;

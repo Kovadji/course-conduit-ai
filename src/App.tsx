@@ -11,6 +11,7 @@ import Courses from "./pages/Courses";
 import CourseDetail from "./pages/CourseDetail";
 import CourseLearn from "./pages/CourseLearn";
 import AiTutor from "./pages/AiTutor";
+import StudentRoadmap from "./pages/StudentRoadmap";
 import Forum from "./pages/Forum";
 import ForumThread from "./pages/ForumThread";
 import Chat from "./pages/Chat";
@@ -52,6 +53,7 @@ const App = () => (
                           <Route path="/course/:courseId" element={<CourseDetail />} />
                           <Route path="/course/:courseId/learn" element={<CourseLearn />} />
                           <Route path="/ai-tutor" element={<AiTutor />} />
+                          <Route path="/student-roadmap" element={<StudentRoadmap />} />
                           <Route path="/forum" element={<Forum />} />
                           <Route path="/forum/:threadId" element={<ForumThread />} />
                           <Route path="/chat" element={<Chat />} />
