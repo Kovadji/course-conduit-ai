@@ -1,4 +1,4 @@
-import { LayoutDashboard, BookOpen, GraduationCap, MessageSquare, Calendar, ShoppingCart, ClipboardList } from "lucide-react";
+import { LayoutDashboard, BookOpen, GraduationCap, MessageSquare, Calendar, ShoppingCart, ClipboardList, Users } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import {
   Sidebar,
@@ -15,6 +15,7 @@ const items = [
   { title: "Dashboard", url: "/", icon: LayoutDashboard },
   { title: "Courses", url: "/courses", icon: BookOpen },
   { title: "Ai-tutor", url: "/ai-tutor", icon: GraduationCap },
+  { title: "Forum", url: "/forum", icon: Users },
   { title: "Chat", url: "/chat", icon: MessageSquare },
   { title: "Calendar", url: "/calendar", icon: Calendar },
   { title: "Cart", url: "/cart", icon: ShoppingCart },
