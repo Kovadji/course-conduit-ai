@@ -54,7 +54,7 @@ export const PomodoroTimer = () => {
   const progressPercentage = ((totalDuration - timeLeft) / totalDuration) * 100;
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 p-4 rounded-lg bg-white">
       <div className="text-center">
         <h3 className="text-sm font-medium text-muted-foreground mb-1">
           {mode === "work" ? "Фокус сессия" : "Перерыв"}

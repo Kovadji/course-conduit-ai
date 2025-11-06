@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Card } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ChevronLeft, ChevronRight, Clock } from "lucide-react";
@@ -387,9 +387,31 @@ const Calendar = () => {
 
       {/* Right Sidebar - Mini Calendar and Pomodoro */}
       <div className="w-80 space-y-4">
-        {/* Pomodoro Timer */}
-        <Card className="p-6 bg-gradient-to-br from-primary/10 to-primary/5">
-          <PomodoroTimer />
+        <Card className="lg:col-span-1">
+          <CardHeader>
+            <CardTitle className="text-lg">Напоминания</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <div className="flex items-start gap-3">
+                <div className="w-2 h-2 rounded-full bg-primary mt-2" />
+                <div className="flex-1">
+                  <p className="text-sm font-medium">Тест по математике</p>
+                  <p className="text-xs text-muted-foreground">Завтра в 14:00</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <div className="w-2 h-2 rounded-full bg-primary mt-2" />
+                <div className="flex-1">
+                  <p className="text-sm font-medium">Курс по химии</p>
+                  <p className="text-xs text-muted-foreground">Пятница в 16:30</p>
+                </div>
+              </div>
+            </div>
+            <div className="pt-4 border-t">
+              <PomodoroTimer />
+            </div>
+          </CardContent>
         </Card>
         
         <Card className="p-4">

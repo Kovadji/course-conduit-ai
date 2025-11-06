@@ -5,7 +5,9 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Heart, MessageSquare } from "lucide-react";
+import { ArrowLeft, Heart, MessageSquare, AlertTriangle } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 interface Post {
   id: string;
@@ -83,6 +85,7 @@ const ForumThread = () => {
   const { threadId } = useParams();
   const navigate = useNavigate();
   const [newPost, setNewPost] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [posts, setPosts] = useState<Post[]>(
     threadData[threadId || "1"]?.posts || []
   );
@@ -100,8 +103,26 @@ const ForumThread = () => {
     );
   }
 
-  const handleAddPost = () => {
-    if (newPost.trim()) {
+  const handleAddPost = async () => {
+    if (!newPost.trim() || isSubmitting) return;
+
+    setIsSubmitting(true);
+    try {
+      // Moderate content with OpenAI
+      const { data, error } = await supabase.functions.invoke('moderate-content', {
+        body: { content: newPost }
+      });
+
+      if (error) throw error;
+
+      if (!data.allowed) {
+        toast.error("Сообщение содержит недопустимый контент", {
+          description: "Пожалуйста, измените текст и попробуйте снова"
+        });
+        setIsSubmitting(false);
+        return;
+      }
+
       const post: Post = {
         id: String(posts.length + 1),
         author: "Вы",
@@ -111,6 +132,12 @@ const ForumThread = () => {
       };
       setPosts([...posts, post]);
       setNewPost("");
+      toast.success("Сообщение добавлено");
+    } catch (error) {
+      console.error('Error moderating content:', error);
+      toast.error("Ошибка при отправке сообщения");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -184,7 +211,13 @@ const ForumThread = () => {
               onChange={(e) => setNewPost(e.target.value)}
               className="min-h-[120px] mb-4"
             />
-            <Button onClick={handleAddPost}>Опубликовать</Button>
+            <Button onClick={handleAddPost} disabled={isSubmitting}>
+              {isSubmitting ? "Проверка..." : "Опубликовать"}
+            </Button>
+            <p className="text-xs text-muted-foreground mt-2 flex items-center gap-1">
+              <AlertTriangle className="w-3 h-3" />
+              Сообщения проверяются на недопустимый контент
+            </p>
           </CardContent>
         </Card>
       </div>

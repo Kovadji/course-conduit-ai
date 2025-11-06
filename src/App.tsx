@@ -14,6 +14,9 @@ import AiTutor from "./pages/AiTutor";
 import StudentRoadmap from "./pages/StudentRoadmap";
 import Forum from "./pages/Forum";
 import ForumThread from "./pages/ForumThread";
+import VirtualLab from "./pages/VirtualLab";
+import Library from "./pages/Library";
+import Notes from "./pages/Notes";
 import Chat from "./pages/Chat";
 import Calendar from "./pages/Calendar";
 import Cart from "./pages/Cart";
@@ -56,6 +59,9 @@ const App = () => (
                           <Route path="/student-roadmap" element={<StudentRoadmap />} />
                           <Route path="/forum" element={<Forum />} />
                           <Route path="/forum/:threadId" element={<ForumThread />} />
+                          <Route path="/virtual-lab" element={<VirtualLab />} />
+                          <Route path="/library" element={<Library />} />
+                          <Route path="/notes" element={<Notes />} />
                           <Route path="/chat" element={<Chat />} />
                           <Route path="/calendar" element={<Calendar />} />
                           <Route path="/cart" element={<Cart />} />
