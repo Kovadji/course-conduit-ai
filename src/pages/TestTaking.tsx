@@ -145,8 +145,16 @@ const TestTaking = () => {
   };
 
   if (isSubmitted) {
+    const score = Math.round((Object.values(answers).filter((ans, i) => 
+      questions[i].type !== "essay" && ans === questions[i].correctAnswer
+    ).length / questions.filter(q => q.type !== "essay").length) * 100);
+
+    const weakTopics = questions
+      .filter((q, i) => q.type !== "essay" && answers[q.id] !== q.correctAnswer)
+      .map(q => q.question.split(':')[0] || 'General');
+
     return (
-      <div className="p-6 max-w-2xl mx-auto animate-fade-in">
+      <div className="p-6 max-w-3xl mx-auto animate-fade-in space-y-6">
         <Card className="p-8 text-center space-y-6">
           <div className="space-y-2">
             <h2 className="text-3xl font-bold">Test Completed!</h2>
@@ -154,13 +162,21 @@ const TestTaking = () => {
           </div>
           
           <div className="py-6">
-            <div className="text-6xl font-bold text-primary">
-              {Math.round((Object.values(answers).filter((ans, i) => 
-                questions[i].type !== "essay" && ans === questions[i].correctAnswer
-              ).length / questions.filter(q => q.type !== "essay").length) * 100)}%
-            </div>
+            <div className="text-6xl font-bold text-primary">{score}%</div>
             <p className="text-muted-foreground mt-2">Your Score</p>
           </div>
+
+          <Card className="p-6 text-left">
+            <h3 className="font-semibold text-lg mb-3">Analysis & Recommendations</h3>
+            <div className="space-y-3 text-sm">
+              <p className="text-muted-foreground">
+                <strong>Topics to review:</strong> {weakTopics.length > 0 ? weakTopics.join(', ') : 'All topics mastered!'}
+              </p>
+              <p className="text-muted-foreground">
+                <strong>Recommendation:</strong> {score >= 80 ? 'Excellent! Continue practicing.' : 'Focus on weak areas and retake the test.'}
+              </p>
+            </div>
+          </Card>
 
           <div className="space-y-2">
             <Button onClick={() => navigate("/tests")} className="w-full">

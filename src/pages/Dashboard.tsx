@@ -93,7 +93,7 @@ const Dashboard = () => {
           </div>
 
           {/* Course Progress */}
-          <Card className="p-6 hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate('/courses')}>
+          <Card className="p-6 hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate('/profile')}>
             <div className="space-y-4">
               <div className="space-y-3">
                 <div className="flex items-center justify-between">

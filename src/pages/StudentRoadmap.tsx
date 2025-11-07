@@ -9,10 +9,12 @@ import { Progress } from "@/components/ui/progress";
 import { CheckCircle2, Circle, Calendar, Target } from "lucide-react";
 
 interface Question {
-  id: string;
-  question: string;
+  id: number;
   type: "single" | "multiple" | "input";
+  question: string;
   options?: string[];
+  placeholder?: string;
+  condition?: (answers: Record<number, any>) => boolean;
 }
 
 interface Goal {
@@ -21,45 +23,91 @@ interface Goal {
   milestones: string[];
 }
 
-const questions: Question[] = [
-  {
-    id: "ielts",
-    question: "Будешь ли ты готовиться к IELTS?",
-    type: "single",
-    options: ["Да", "Нет", "Пока не решил"],
-  },
-  {
-    id: "ielts_level",
-    question: "Какой у тебя текущий уровень английского?",
-    type: "single",
-    options: ["Beginner (A1-A2)", "Intermediate (B1-B2)", "Advanced (C1-C2)"],
-  },
-  {
-    id: "ent",
-    question: "Хочешь ли ты сдавать ЕНТ?",
-    type: "single",
-    options: ["Да", "Нет"],
-  },
-  {
-    id: "ent_subjects",
-    question: "Какие предметы ты будешь выбирать для ЕНТ?",
-    type: "multiple",
-    options: ["Математика", "Физика", "Химия", "Биология", "География", "История", "Информатика"],
-  },
-  {
-    id: "timeline",
-    question: "Сколько времени у тебя есть на подготовку? (в месяцах)",
-    type: "input",
-  },
-];
-
 const StudentRoadmap = () => {
   const [currentStep, setCurrentStep] = useState(0);
-  const [answers, setAnswers] = useState<Record<string, any>>({});
+  const [answers, setAnswers] = useState<Record<number, any>>({});
   const [showRoadmap, setShowRoadmap] = useState(false);
 
-  const currentQuestion = questions[currentStep];
-  const progress = ((currentStep + 1) / questions.length) * 100;
+  const questions: Question[] = [
+    {
+      id: 1,
+      type: "single",
+      question: "Будете ли вы готовиться к IELTS?",
+      options: ["Да", "Нет"],
+      condition: () => true
+    },
+    {
+      id: 2,
+      type: "single",
+      question: "Какой у вас текущий уровень английского?",
+      options: ["Beginner (A1)", "Elementary (A2)", "Intermediate (B1)", "Upper-Intermediate (B2)", "Advanced (C1)", "Proficiency (C2)"],
+      condition: (answers) => answers[1] === "Да"
+    },
+    {
+      id: 3,
+      type: "single",
+      question: "Какой балл IELTS вы хотите получить?",
+      options: ["6.0", "6.5", "7.0", "7.5", "8.0+"],
+      condition: (answers) => answers[1] === "Да"
+    },
+    {
+      id: 4,
+      type: "single",
+      question: "Хотите ли вы сдавать ЕНТ?",
+      options: ["Да", "Нет"],
+      condition: () => true
+    },
+    {
+      id: 5,
+      type: "multiple",
+      question: "Какие предметы вы будете выбирать для ЕНТ?",
+      options: ["Математика", "Физика", "Химия", "Биология", "История Казахстана", "География", "Всемирная история", "Английский язык"],
+      condition: (answers) => answers[4] === "Да"
+    },
+    {
+      id: 6,
+      type: "single",
+      question: "Какой балл ЕНТ вы хотите получить?",
+      options: ["100-110", "110-120", "120-130", "130-140"],
+      condition: (answers) => answers[4] === "Да"
+    },
+    {
+      id: 7,
+      type: "input",
+      question: "Сколько времени у вас есть на подготовку? (в месяцах)",
+      placeholder: "Например: 6",
+      condition: () => true
+    },
+    {
+      id: 8,
+      type: "single",
+      question: "Сколько часов в день вы можете уделять учебе?",
+      options: ["1-2 часа", "2-3 часа", "3-4 часа", "4+ часов"],
+      condition: () => true
+    },
+    {
+      id: 9,
+      type: "single",
+      question: "Есть ли у вас опыт в программировании?",
+      options: ["Да", "Нет", "Немного"],
+      condition: () => true
+    },
+    {
+      id: 10,
+      type: "multiple",
+      question: "Какие навыки вы хотите развить?",
+      options: ["Критическое мышление", "Тайм-менеджмент", "Публичные выступления", "Командная работа", "Креативность", "Лидерство"],
+      condition: () => true
+    }
+  ];
+
+  const getVisibleQuestions = () => {
+    return questions.filter(q => !q.condition || q.condition(answers));
+  };
+
+  const visibleQuestions = getVisibleQuestions();
+  const currentQuestion = visibleQuestions[currentStep];
+  const progress = ((currentStep + 1) / visibleQuestions.length) * 100;
 
   const handleSingleAnswer = (value: string) => {
     setAnswers({ ...answers, [currentQuestion.id]: value });
@@ -82,7 +130,7 @@ const StudentRoadmap = () => {
   };
 
   const handleNext = () => {
-    if (currentStep < questions.length - 1) {
+    if (currentStep < visibleQuestions.length - 1) {
       setCurrentStep(currentStep + 1);
     } else {
       setShowRoadmap(true);
@@ -97,17 +145,17 @@ const StudentRoadmap = () => {
 
   const generateRoadmap = (): Goal[] => {
     const roadmap: Goal[] = [];
-    const timeline = parseInt(answers.timeline) || 6;
+    const timeline = parseInt(answers[7]) || 6;
     const today = new Date();
 
-    if (answers.ielts === "Да") {
-      const level = answers.ielts_level;
-      const months = level === "Beginner (A1-A2)" ? 6 : level === "Intermediate (B1-B2)" ? 4 : 3;
+    if (answers[1] === "Да") {
+      const level = answers[2];
+      const targetScore = answers[3];
       const deadline = new Date(today);
-      deadline.setMonth(deadline.getMonth() + Math.min(months, timeline));
+      deadline.setMonth(deadline.getMonth() + timeline);
 
       roadmap.push({
-        title: `Подготовка к IELTS (целевой балл: ${level === "Advanced (C1-C2)" ? "7.5+" : level === "Intermediate (B1-B2)" ? "6.5-7.0" : "5.5-6.0"})`,
+        title: `Подготовка к IELTS (целевой балл: ${targetScore})`,
         deadline: deadline.toLocaleDateString('ru-RU'),
         milestones: [
           "Пройти пробный тест и определить слабые стороны",
@@ -121,14 +169,15 @@ const StudentRoadmap = () => {
       });
     }
 
-    if (answers.ent === "Да") {
-      const subjects = answers.ent_subjects || [];
+    if (answers[4] === "Да") {
+      const subjects = answers[5] || [];
+      const targetScore = answers[6];
       const deadline = new Date(today);
       deadline.setMonth(deadline.getMonth() + timeline);
 
       subjects.forEach((subject: string) => {
         roadmap.push({
-          title: `Подготовка к ЕНТ: ${subject}`,
+          title: `Подготовка к ЕНТ: ${subject} (цель: ${targetScore})`,
           deadline: deadline.toLocaleDateString('ru-RU'),
           milestones: [
             `Изучить программу и темы по ${subject}`,

@@ -36,6 +36,36 @@ const Courses = () => {
       rating: 4.3,
       author: "zh.fair",
       image: "gradient"
+    },
+    {
+      id: "2",
+      title: "Advanced Mathematics",
+      price: "89$",
+      description: "Master calculus, linear algebra and differential equations.",
+      students: "12.3K",
+      rating: 4.7,
+      author: "Dr.Khan",
+      image: "gradient"
+    },
+    {
+      id: "3",
+      title: "IELTS Speaking Mastery",
+      price: "99$",
+      description: "Achieve band 7+ in IELTS speaking with expert strategies.",
+      students: "8.7K",
+      rating: 4.5,
+      author: "Emma.L",
+      image: "gradient"
+    },
+    {
+      id: "4",
+      title: "Physics for ENT",
+      price: "110$",
+      description: "Complete physics preparation for ENT exam.",
+      students: "15.2K",
+      rating: 4.8,
+      author: "Prof.T",
+      image: "gradient"
     }
   ]);
 

@@ -24,6 +24,8 @@ import Auth from "./pages/Auth";
 import Tests from "./pages/Tests";
 import TestTaking from "./pages/TestTaking";
 import NotFound from "./pages/NotFound";
+import Profile from "./pages/Profile";
+import Interests from "./pages/Interests";
 
 const queryClient = new QueryClient();
 
@@ -40,6 +42,7 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/auth" element={<Auth />} />
+          <Route path="/interests" element={<Interests />} />
           <Route
             path="/*"
             element={
@@ -67,6 +70,7 @@ const App = () => (
                           <Route path="/cart" element={<Cart />} />
                           <Route path="/tests" element={<Tests />} />
                           <Route path="/test/:testId" element={<TestTaking />} />
+                          <Route path="/profile" element={<Profile />} />
                           <Route path="*" element={<NotFound />} />
                         </Routes>
                       </main>

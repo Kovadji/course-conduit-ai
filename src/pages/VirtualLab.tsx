@@ -111,7 +111,7 @@ const VirtualLab = () => {
         </Button>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div>
+          <div className="space-y-6">
             <Card>
               <CardHeader>
                 <div className="flex items-center justify-between">
@@ -126,6 +126,26 @@ const VirtualLab = () => {
                 <div className="aspect-video bg-muted rounded-lg flex items-center justify-center mb-4">
                   <Play className="w-12 h-12 text-muted-foreground" />
                   <p className="ml-2 text-sm text-muted-foreground">Видео инструкция</p>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Interactive Experiment Area */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Интерактивная лаборатория</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="aspect-square bg-gradient-to-br from-muted to-muted/50 rounded-lg p-6 flex items-center justify-center">
+                  <div className="text-center space-y-4">
+                    <Zap className="w-16 h-16 mx-auto text-primary animate-pulse" />
+                    <p className="text-sm text-muted-foreground">
+                      Интерактивный эксперимент будет здесь
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      Следуйте шагам справа для выполнения эксперимента
+                    </p>
+                  </div>
                 </div>
               </CardContent>
             </Card>

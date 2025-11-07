@@ -21,8 +21,8 @@ const Notes = () => {
     if (!canvasRef.current || fabricCanvas) return;
 
     const canvas = new FabricCanvas(canvasRef.current, {
-      width: 800,
-      height: 600,
+      width: window.innerWidth > 1024 ? 1200 : 800,
+      height: window.innerHeight - 300,
       backgroundColor: "#ffffff",
       isDrawingMode: false,
     });
@@ -134,8 +134,8 @@ const Notes = () => {
         </TabsContent>
 
         <TabsContent value="draw">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-            <div className="lg:col-span-1">
+          <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-6">
+            <div>
               <Card>
                 <CardContent className="pt-6 space-y-6">
                   <div>
@@ -221,10 +221,10 @@ const Notes = () => {
               </Card>
             </div>
 
-            <div className="lg:col-span-3">
-              <Card>
-                <CardContent className="pt-6">
-                  <div className="border rounded-lg overflow-hidden shadow-lg">
+            <div className="flex-1">
+              <Card className="h-full">
+                <CardContent className="pt-6 h-full">
+                  <div className="border rounded-lg overflow-hidden shadow-lg h-[calc(100vh-200px)] flex items-center justify-center bg-muted/20">
                     <canvas ref={canvasRef} />
                   </div>
                 </CardContent>

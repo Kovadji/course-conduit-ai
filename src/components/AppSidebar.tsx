@@ -11,6 +11,7 @@ import {
   FlaskConical,
   Library,
   NotebookPen,
+  User,
 } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import {
@@ -36,6 +37,7 @@ const items = [
   { title: "Chat", url: "/chat", icon: MessageSquare },
   { title: "Calendar", url: "/calendar", icon: Calendar },
   { title: "Cart", url: "/cart", icon: ShoppingCart },
+  { title: "Profile", url: "/profile", icon: User },
 ];
 
 export function AppSidebar() {
