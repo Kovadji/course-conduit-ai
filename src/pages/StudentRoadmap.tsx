@@ -6,7 +6,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
-import { CheckCircle2, Circle, Calendar, Target } from "lucide-react";
+import { Circle, Calendar, Target } from "lucide-react";
 
 interface Question {
   id: number;
@@ -87,16 +87,16 @@ const StudentRoadmap = () => {
     },
     {
       id: 9,
-      type: "single",
-      question: "Есть ли у вас опыт в программировании?",
-      options: ["Да", "Нет", "Немного"],
+      type: "multiple",
+      question: "Какие у вас хобби?",
+      options: ["Спорт", "Музыка", "Искусство", "Программирование", "Чтение", "Игры", "Фотография", "Видеомонтаж"],
       condition: () => true
     },
     {
       id: 10,
       type: "multiple",
-      question: "Какие навыки вы хотите развить?",
-      options: ["Критическое мышление", "Тайм-менеджмент", "Публичные выступления", "Командная работа", "Креативность", "Лидерство"],
+      question: "Что вы хотите развивать больше всего?",
+      options: ["Логическое мышление", "Креативность", "Коммуникация", "Лидерство", "Технические навыки", "Языки"],
       condition: () => true
     }
   ];
@@ -199,10 +199,10 @@ const StudentRoadmap = () => {
     const roadmap = generateRoadmap();
 
     return (
-      <div className="min-h-screen bg-background p-6">
+      <div className="min-h-screen bg-background p-4 md:p-6">
         <div className="max-w-4xl mx-auto">
           <div className="mb-8">
-            <h1 className="text-4xl font-bold mb-2">Твой персональный план обучения</h1>
+            <h1 className="text-3xl md:text-4xl font-bold mb-2">Твой персональный план обучения</h1>
             <p className="text-muted-foreground">
               На основе твоих ответов мы составили пошаговый план достижения твоих целей
             </p>
@@ -214,9 +214,9 @@ const StudentRoadmap = () => {
                 <CardHeader>
                   <div className="flex items-start justify-between">
                     <div className="flex items-start gap-3">
-                      <Target className="w-6 h-6 text-primary mt-1" />
+                      <Target className="w-6 h-6 text-primary mt-1 flex-shrink-0" />
                       <div>
-                        <CardTitle className="text-xl">{goal.title}</CardTitle>
+                        <CardTitle className="text-lg md:text-xl">{goal.title}</CardTitle>
                         <div className="flex items-center gap-2 mt-2 text-sm text-muted-foreground">
                           <Calendar className="w-4 h-4" />
                           <span>Дедлайн: {goal.deadline}</span>
@@ -257,16 +257,16 @@ const StudentRoadmap = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-6">
+    <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <Card className="w-full max-w-2xl">
         <CardHeader>
           <div className="mb-4">
             <Progress value={progress} className="h-2" />
             <p className="text-sm text-muted-foreground mt-2">
-              Вопрос {currentStep + 1} из {questions.length}
+              Вопрос {currentStep + 1} из {visibleQuestions.length}
             </p>
           </div>
-          <CardTitle className="text-2xl">{currentQuestion.question}</CardTitle>
+          <CardTitle className="text-xl md:text-2xl">{currentQuestion.question}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
           {currentQuestion.type === "single" && (
@@ -307,7 +307,7 @@ const StudentRoadmap = () => {
           {currentQuestion.type === "input" && (
             <Input
               type="number"
-              placeholder="Введите количество месяцев"
+              placeholder={currentQuestion.placeholder}
               value={answers[currentQuestion.id] || ""}
               onChange={(e) => handleInputAnswer(e.target.value)}
               className="text-lg p-6"
@@ -327,7 +327,7 @@ const StudentRoadmap = () => {
               disabled={!answers[currentQuestion.id] || 
                 (currentQuestion.type === "multiple" && answers[currentQuestion.id]?.length === 0)}
             >
-              {currentStep === questions.length - 1 ? "Получить план" : "Далее"}
+              {currentStep === visibleQuestions.length - 1 ? "Получить план" : "Далее"}
             </Button>
           </div>
         </CardContent>

@@ -1,79 +1,70 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { 
-  Music, Shirt, Gamepad2, Dog, Plane, Laptop, 
-  Sparkles, Pizza, Theater, Dumbbell, Film, Heart,
-  Calendar, Printer, Frown, Package, Home, Paintbrush
-} from "lucide-react";
+import { toast } from "sonner";
 
 const interests = [
-  { id: "music", label: "Music", icon: Music },
-  { id: "fashion", label: "Fashion", icon: Shirt },
-  { id: "games", label: "Games", icon: Gamepad2 },
-  { id: "pet", label: "Pet", icon: Dog },
-  { id: "travelling", label: "Travelling", icon: Plane },
-  { id: "technology", label: "Technology", icon: Laptop },
-  { id: "beauty", label: "Beauty", icon: Sparkles },
-  { id: "food", label: "Food", icon: Pizza },
-  { id: "comedy", label: "Comedy", icon: Theater },
-  { id: "skincare", label: "Skincare", icon: Heart },
-  { id: "wellness", label: "Wellness", icon: Dumbbell },
-  { id: "bag", label: "Bag", icon: Package },
-  { id: "accessories", label: "Accessories", icon: Package },
-  { id: "architecture", label: "Architecture", icon: Home },
-  { id: "art", label: "Art", icon: Paintbrush },
-  { id: "sport", label: "Sport", icon: Dumbbell },
-  { id: "film", label: "Film", icon: Film },
-  { id: "drama", label: "Drama", icon: Theater },
-  { id: "calendar", label: "Calendar", icon: Calendar },
-  { id: "printer", label: "Printer", icon: Printer },
-  { id: "sad", label: "Sad", icon: Frown }
+  { id: "math", name: "Математика", icon: "📐", category: "science" },
+  { id: "physics", name: "Физика", icon: "⚛️", category: "science" },
+  { id: "chemistry", name: "Химия", icon: "🧪", category: "science" },
+  { id: "biology", name: "Биология", icon: "🧬", category: "science" },
+  { id: "history", name: "История", icon: "📚", category: "humanities" },
+  { id: "literature", name: "Литература", icon: "📖", category: "humanities" },
+  { id: "english", name: "Английский", icon: "🇬🇧", category: "languages" },
+  { id: "ielts", name: "IELTS", icon: "🎓", category: "languages" },
+  { id: "programming", name: "Программирование", icon: "💻", category: "tech" },
+  { id: "art", name: "Искусство", icon: "🎨", category: "creative" },
+  { id: "music", name: "Музыка", icon: "🎵", category: "creative" },
+  { id: "sports", name: "Спорт", icon: "⚽", category: "health" },
 ];
 
 const Interests = () => {
   const navigate = useNavigate();
-  const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
+  const [selected, setSelected] = useState<string[]>([]);
 
   const toggleInterest = (id: string) => {
-    setSelectedInterests(prev =>
+    setSelected(prev =>
       prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
     );
   };
 
   const handleContinue = () => {
-    // Save interests to localStorage or backend
-    localStorage.setItem("userInterests", JSON.stringify(selectedInterests));
+    if (selected.length === 0) {
+      toast.error("Выберите хотя бы один интерес");
+      return;
+    }
+    
+    localStorage.setItem("userInterests", JSON.stringify(selected));
+    localStorage.setItem("interestsCompleted", "true");
+    toast.success("Интересы сохранены!");
     navigate("/dashboard");
   };
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
-      <div className="max-w-2xl w-full space-y-8 animate-fade-in">
+      <div className="max-w-4xl w-full space-y-8 animate-fade-in">
         <div className="text-center space-y-4">
-          <h1 className="text-4xl font-bold">Choose The Topics You Truly Love</h1>
+          <h1 className="text-4xl font-bold">Выберите что вы хотите изучать</h1>
           <p className="text-muted-foreground text-lg">
-            Choose the topics you truly love and personalize your feed with inspiring content.
+            Выберите интересующие вас предметы для персонализированных рекомендаций
           </p>
         </div>
 
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {interests.map((interest) => {
-            const Icon = interest.icon;
-            const isSelected = selectedInterests.includes(interest.id);
+            const isSelected = selected.includes(interest.id);
             return (
               <button
                 key={interest.id}
                 onClick={() => toggleInterest(interest.id)}
-                className={`flex items-center gap-2 p-3 rounded-lg border-2 transition-all ${
+                className={`flex flex-col items-center gap-3 p-6 rounded-xl border-2 transition-all hover:scale-105 ${
                   isSelected
-                    ? "border-primary bg-primary/10 text-primary"
-                    : "border-border hover:border-muted-foreground"
+                    ? "border-primary bg-primary/10 text-primary shadow-lg"
+                    : "border-border hover:border-muted-foreground hover:bg-muted/30"
                 }`}
               >
-                <Icon className="w-4 h-4" />
-                <span className="text-sm font-medium">{interest.label}</span>
+                <span className="text-4xl">{interest.icon}</span>
+                <span className="text-sm font-medium text-center">{interest.name}</span>
               </button>
             );
           })}
@@ -83,10 +74,10 @@ const Interests = () => {
           <Button
             size="lg"
             onClick={handleContinue}
-            disabled={selectedInterests.length === 0}
+            disabled={selected.length === 0}
             className="w-full"
           >
-            Continue
+            Продолжить
           </Button>
           <Button
             size="lg"
@@ -94,7 +85,7 @@ const Interests = () => {
             onClick={() => navigate("/dashboard")}
             className="w-full"
           >
-            Maybe Later
+            Может быть позже
           </Button>
         </div>
       </div>

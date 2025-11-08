@@ -204,9 +204,14 @@ const Calendar = () => {
                       <div className="flex items-center gap-2">
                         <Clock className="h-4 w-4 text-muted-foreground" />
                         <Input type="text" value={startTime} onChange={(e) => setStartTime(e.target.value)} />
-                      </div>
-                    </div>
-                  </div>
+          </div>
+        </div>
+        
+        {/* Fixed Pomodoro Timer at bottom right */}
+        <div className="fixed bottom-4 right-4 z-40">
+          <PomodoroTimer />
+        </div>
+      </div>
                   <div className="space-y-2">
                     <Label>End</Label>
                     <div className="space-y-2">

@@ -12,6 +12,7 @@ import {
   Library,
   NotebookPen,
   User,
+  Compass,
 } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import {
@@ -38,6 +39,7 @@ const items = [
   { title: "Calendar", url: "/calendar", icon: Calendar },
   { title: "Cart", url: "/cart", icon: ShoppingCart },
   { title: "Profile", url: "/profile", icon: User },
+  { title: "Профориентация", url: "/career-orientation", icon: Compass },
 ];
 
 export function AppSidebar() {

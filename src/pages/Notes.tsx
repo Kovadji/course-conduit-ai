@@ -24,7 +24,7 @@ const Notes = () => {
       width: window.innerWidth > 1024 ? 1200 : 800,
       height: window.innerHeight - 300,
       backgroundColor: "#ffffff",
-      isDrawingMode: false,
+      isDrawingMode: true,
     });
 
     const brush = new PencilBrush(canvas);

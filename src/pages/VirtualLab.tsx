@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { FlaskConical, Zap, Play, CheckCircle2 } from "lucide-react";
+import ElectricCircuit from "@/components/ElectricCircuit";
 
 interface Experiment {
   id: string;
@@ -136,17 +137,21 @@ const VirtualLab = () => {
                 <CardTitle>Интерактивная лаборатория</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="aspect-square bg-gradient-to-br from-muted to-muted/50 rounded-lg p-6 flex items-center justify-center">
-                  <div className="text-center space-y-4">
-                    <Zap className="w-16 h-16 mx-auto text-primary animate-pulse" />
-                    <p className="text-sm text-muted-foreground">
-                      Интерактивный эксперимент будет здесь
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      Следуйте шагам справа для выполнения эксперимента
-                    </p>
+                {selectedExperiment.subject === "physics" ? (
+                  <ElectricCircuit />
+                ) : (
+                  <div className="aspect-square bg-gradient-to-br from-muted to-muted/50 rounded-lg p-6 flex items-center justify-center">
+                    <div className="text-center space-y-4">
+                      <FlaskConical className="w-16 h-16 mx-auto text-primary animate-pulse" />
+                      <p className="text-sm text-muted-foreground">
+                        Химический эксперимент
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        Следуйте шагам справа для выполнения эксперимента
+                      </p>
+                    </div>
                   </div>
-                </div>
+                )}
               </CardContent>
             </Card>
           </div>

@@ -17,6 +17,7 @@ const Courses = () => {
   const [showCreateCourse, setShowCreateCourse] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const userInterests = JSON.parse(localStorage.getItem("userInterests") || "[]");
   const [searchResults] = useState({
     last: ["Leadership and comunication", "Speaking", "UI/UX Design"],
     others: ["Speaking", "Speaking"]
