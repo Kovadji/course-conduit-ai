@@ -204,14 +204,9 @@ const Calendar = () => {
                       <div className="flex items-center gap-2">
                         <Clock className="h-4 w-4 text-muted-foreground" />
                         <Input type="text" value={startTime} onChange={(e) => setStartTime(e.target.value)} />
-          </div>
-        </div>
-        
-        {/* Fixed Pomodoro Timer at bottom right */}
-        <div className="fixed bottom-4 right-4 z-40">
-          <PomodoroTimer />
-        </div>
-      </div>
+                      </div>
+                    </div>
+                  </div>
                   <div className="space-y-2">
                     <Label>End</Label>
                     <div className="space-y-2">
@@ -413,16 +408,13 @@ const Calendar = () => {
                 </div>
               </div>
             </div>
-            <div className="pt-4 border-t">
-              <PomodoroTimer />
-            </div>
           </CardContent>
         </Card>
         
         <Card className="p-4">
           <div className="flex items-center justify-between mb-4">
-            <Button 
-              variant="ghost" 
+            <Button
+              variant="ghost"
               size="icon"
               onClick={() => {
                 const newDate = new Date(currentDate);
@@ -433,8 +425,8 @@ const Calendar = () => {
               <ChevronLeft className="h-4 w-4" />
             </Button>
             <span className="font-medium">{formatMonthYear(currentDate)}</span>
-            <Button 
-              variant="ghost" 
+            <Button
+              variant="ghost"
               size="icon"
               onClick={() => {
                 const newDate = new Date(currentDate);
@@ -453,8 +445,8 @@ const Calendar = () => {
               </div>
             ))}
           </div>
-          
-          <div className="grid grid-cols-7 gap-2">
+
+          <div className="grid grid-cols-7 gap-2 mb-6">
             {monthDays.map((day) => {
               const isCurrentDay = day === currentDate.getDate();
               return (
@@ -473,6 +465,15 @@ const Calendar = () => {
                 </button>
               );
             })}
+          </div>
+
+          <div className="pt-6 border-t">
+            <CardHeader className="px-0 pt-0">
+              <CardTitle className="text-base">Pomodoro Timer</CardTitle>
+            </CardHeader>
+            <CardContent className="px-0 pb-0 pt-4">
+              <PomodoroTimer />
+            </CardContent>
           </div>
         </Card>
       </div>
